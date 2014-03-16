@@ -1,0 +1,66 @@
+/**
+ * JJTree template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
+ */options{  JDK_VERSION = "1.5";  static = true;
+  MULTI = true;}PARSER_BEGIN(EG2)package REGEX;
+
+public class EG2{  public static void main(String args [])  {      }}PARSER_END(EG2)SKIP :{  " "| "\t"| "\n"| "\r"| < "//" (~[ "\n", "\r" ])*    (      "\n"    | "\r"    | "\r\n"    ) >| < "/*" (~[ "*" ])* "*"    (      ~[ "/" ] (~[ "*" ])* "*"    )*    "/" >}TOKEN : /* IDENTIFIERS */{
+
+	< INTEGER : (["0" - "9"])+ > |
+  		< ID : ["A"- "Z"](["0"-"9","a"-"z","A"-"Z"])* > |
+
+	< QUANTIFIER_ANY : "*" >|
+
+	< QUANTIFIER_ONEORMORE : "+" >|
+
+	< QUANTIFIER_ZEROORONE : "?" >|
+
+	< QUANTIFIER_NRFIXED : "{"< INTEGER >"}" >|
+
+	< QUANTIFIER_NRTOUNBOUND : "{"< INTEGER >",""}" >|
+
+	< QUANTIFIER_NRTONR : "{"< INTEGER >","< INTEGER >"}" >//lookahead de 3 necessario para distinguir este do de cima
+
+	
+}SimpleNode Regex() #Regex:{}{
+  Quantifier()}
+
+SimpleNode Quantifier() :{Token quant;}{
+
+  {  String str;}	< QUANTIFIER_ANY >	{		jjtThis.lowerBound=0;
+		jjtThis.upperBound=Integer.MAX_VALUE;
+
+	}|
+	< QUANTIFIER_ONEORMORE >	{		jjtThis.lowerBound=1;
+		jjtThis.upperBound=Integer.MAX_VALUE;
+
+	}|
+	< QUANTIFIER_ZEROORONE >	{		jjtThis.lowerBound=0;
+		jjtThis.upperBound=1;
+	}|
+	quant=< QUANTIFIER_NRFIXED  >	{
+	  	str=quant.image;
+	  	str=str.replaceAll("{","");
+	  	str=str.replaceAll("}","");		jjtThis.lowerBound=Integer.parseInt(str);
+		jjtThis.upperBound=Integer.parseInt(str);
+
+	}|
+	quant=< QUANTIFIER_NRTOUNBOUND >	{		str=quant.image;
+	  	str=str.replaceAll("{","");
+	  	str=str.replaceAll("}","");
+		jjtThis.lowerBound=Integer.parseInt(str);
+		jjtThis.upperBound=Integer.MAX_VALUE;
+	}|
+	quant=< QUANTIFIER_NRTONR >	{		str=quant.image;
+	  	str=str.replaceAll("{","");
+	  	str=str.replaceAll("}","");
+	  	String [] nrs=str.split(",");
+		jjtThis.lowerBound=Integer.parseInt(nrs[0]);
+		jjtThis.upperBound=Integer.parseInt(nrs[1]);
+
+	}
+
+	{		return jjtThis;
+	}
+	
+
+}
