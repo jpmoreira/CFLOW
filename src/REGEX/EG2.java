@@ -13,7 +13,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      Quantifier();
+      Quantifier(null);
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -36,39 +36,30 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     throw new Error("Missing return statement in function");
   }
 
-  static final public SimpleNode Quantifier() throws ParseException {
-                          /*@bgen(jjtree) Quantifier */
-                          ASTQuantifier jjtn000 = new ASTQuantifier(JJTQUANTIFIER);
-                          boolean jjtc000 = true;
-                          jjtree.openNodeScope(jjtn000);Token quant;
+  static final public SimpleNode Quantifier(SimpleNode objectQuantified) throws ParseException {
+                                                     /*@bgen(jjtree) Quantifier */
+                                                     ASTQuantifier jjtn000 = new ASTQuantifier(JJTQUANTIFIER);
+                                                     boolean jjtc000 = true;
+                                                     jjtree.openNodeScope(jjtn000);Token quant;String str;
     try {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case QUANTIFIER_ANY:
-  String str;
         jj_consume_token(QUANTIFIER_ANY);
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
                 jjtn000.lowerBound=0;
                 jjtn000.upperBound=Integer.MAX_VALUE;
         break;
       case QUANTIFIER_ONEORMORE:
         jj_consume_token(QUANTIFIER_ONEORMORE);
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
                 jjtn000.lowerBound=1;
                 jjtn000.upperBound=Integer.MAX_VALUE;
         break;
       case QUANTIFIER_ZEROORONE:
         jj_consume_token(QUANTIFIER_ZEROORONE);
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
                 jjtn000.lowerBound=0;
                 jjtn000.upperBound=1;
         break;
       case QUANTIFIER_NRFIXED:
         quant = jj_consume_token(QUANTIFIER_NRFIXED);
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
                 str=quant.image;
                 str=str.replaceAll("{","");
                 str=str.replaceAll("}","");
@@ -77,8 +68,6 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
         break;
       case QUANTIFIER_NRTOUNBOUND:
         quant = jj_consume_token(QUANTIFIER_NRTOUNBOUND);
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
                 str=quant.image;
                 str=str.replaceAll("{","");
                 str=str.replaceAll("}","");
@@ -93,19 +82,20 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
                 String [] nrs=str.split(",");
                 jjtn000.lowerBound=Integer.parseInt(nrs[0]);
                 jjtn000.upperBound=Integer.parseInt(nrs[1]);
-          jjtree.closeNodeScope(jjtn000, true);
-          jjtc000 = false;
-                {if (true) return jjtn000;}
         break;
       default:
         jj_la1[0] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+                jjtn000.quantified=objectQuantified;
+                {if (true) return jjtn000;}
     } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
     }
     throw new Error("Missing return statement in function");
   }

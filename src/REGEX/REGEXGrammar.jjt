@@ -6,7 +6,7 @@
 public class EG2{  public static void main(String args [])  {      }}PARSER_END(EG2)SKIP :{  " "| "\t"| "\n"| "\r"| < "//" (~[ "\n", "\r" ])*    (      "\n"    | "\r"    | "\r\n"    ) >| < "/*" (~[ "*" ])* "*"    (      ~[ "/" ] (~[ "*" ])* "*"    )*    "/" >}TOKEN : /* IDENTIFIERS */{
 
 	< INTEGER : (["0" - "9"])+ > |
-  		< ID : ["A"- "Z"](["0"-"9","a"-"z","A"-"Z"])* > |
+  		< ID : "\""["A"- "Z"](["0"-"9","a"-"z","A"-"Z"])* "\""> |
 
 	< QUANTIFIER_ANY : "*" >|
 
@@ -22,11 +22,11 @@ public class EG2{  public static void main(String args [])  {      }}PAR
 
 	
 }SimpleNode Regex() #Regex:{}{
-  Quantifier()}
+  Quantifier(null)}
 
-SimpleNode Quantifier() :{Token quant;}{
 
-  {  String str;}	< QUANTIFIER_ANY >	{		jjtThis.lowerBound=0;
+SimpleNode Quantifier(SimpleNode objectQuantified) :{Token quant;String str;}{
+	(	  < QUANTIFIER_ANY >	{		jjtThis.lowerBound=0;
 		jjtThis.upperBound=Integer.MAX_VALUE;
 
 	}|
@@ -57,9 +57,10 @@ SimpleNode Quantifier() :{Token quant;}{
 		jjtThis.lowerBound=Integer.parseInt(nrs[0]);
 		jjtThis.upperBound=Integer.parseInt(nrs[1]);
 
-	}
+	})
 
-	{		return jjtThis;
+	{
+	  	jjtThis.quantified=objectQuantified;		return jjtThis;
 	}
 	
 
