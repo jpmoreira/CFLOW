@@ -22,7 +22,13 @@ public class EG2{  public static void main(String args [])  {      }}PAR
 
 	
 }SimpleNode Regex() #Regex:{}{
-  Quantifier(null)}
+  Quantifier(null)}
+
+
+SimpleNode ID
+SimpleNode Terminal(){}{	(< ID >|)
+
+}
 
 
 SimpleNode Quantifier(SimpleNode objectQuantified) :{Token quant;String str;}{
