@@ -3,10 +3,16 @@
  */options{  JDK_VERSION = "1.5";  static = true;
   MULTI = true;}PARSER_BEGIN(EG2)package REGEX;
 
-public class EG2{  public static void main(String args [])  {      }}PARSER_END(EG2)SKIP :{  " "| "\t"| "\n"| "\r"| < "//" (~[ "\n", "\r" ])*    (      "\n"    | "\r"    | "\r\n"    ) >| < "/*" (~[ "*" ])* "*"    (      ~[ "/" ] (~[ "*" ])* "*"    )*    "/" >}TOKEN : /* IDENTIFIERS */{
+public class EG2{  public static void main(String args [])  {
+
+    try    {
+      EG2 obj=new EG2(System.in);    	SimpleNode s=obj.Regex();
+    	s.dump("");
+    }    catch(ParseException e)    {    }
+  }}PARSER_END(EG2)SKIP :{ " " | "\r" | "\t"}TOKEN : /* IDENTIFIERS */{
 
 	< INTEGER : (["0" - "9"])+ > |
-  		< ID : "\""["A"- "Z"](["0"-"9","a"-"z","A"-"Z"])* "\""> |
+  		< ID : "\""["A"- "Z","a"-"z"](["0"-"9","a"-"z","A"-"Z"])*"\"" > |
 
 	< QUANTIFIER_ANY : "*" >|
 
@@ -18,20 +24,94 @@ public class EG2{  public static void main(String args [])  {      }}PAR
 
 	< QUANTIFIER_NRTOUNBOUND : "{"< INTEGER >",""}" >|
 
-	< QUANTIFIER_NRTONR : "{"< INTEGER >","< INTEGER >"}" >//lookahead de 3 necessario para distinguir este do de cima
+	< QUANTIFIER_NRTONR : "{"< INTEGER >","< INTEGER >"}" >|//lookahead de 3 necessario para distinguir este do de cima
+
+	< LP: "(" >|
+
+	< RP: ")" >|
+
+	< DOT: ".">|
+	
+	< LF: "\n" >
+
 
 	
+	
 }SimpleNode Regex() #Regex:{}{
-  Quantifier(null)}
+  Expression()< LF >
+
+ 
+  {  return jjtThis;}}
 
 
-SimpleNode ID
-SimpleNode Terminal(){}{	(< ID >|)
+void ID_Node():{Token t;}
+{	token=< ID >	{
+	  jjtThis.identifier=token.image.replace("\"","");	}	
+}
 
+void Expression()#void:{int nrChilds=1;}{
+       Group()(("|"Group(){nrChilds++;} )+#OR(nrChilds))?}
+
+void Group()#void:{int nrChilds=1;}{	Terminal()(((<DOT>)?Terminal(){nrChilds++;})+#CONCAT(nrChilds))?
 }
 
+void Terminal():{Token t;String s;String id;Token idToken;}{
 
-SimpleNode Quantifier(SimpleNode objectQuantified) :{Token quant;String str;}{
+
+  {jjtThis.upperBound=1;jjtThis.lowerBound=1;}
+(   ( (idToken=< ID >)   {jjtThis.isTrueTerminal=true;id=idToken.image;id=id.replace("\"","");jjtThis.idString=id;}|(< LP > Expression() < RP >)   {jjtThis.isTrueTerminal=false;})
+ (
+   < QUANTIFIER_ANY >{jjtThis.upperBound=Integer.MAX_VALUE;jjtThis.lowerBound=0;}|
+
+	< QUANTIFIER_ONEORMORE >{jjtThis.upperBound=Integer.MAX_VALUE;jjtThis.lowerBound=1;}|
+
+	< QUANTIFIER_ZEROORONE >{jjtThis.upperBound=1;jjtThis.lowerBound=0;}|
+
+	t=< QUANTIFIER_NRFIXED >{
+		s=t.image;
+		s=s.replace("{","");
+		s=s.replace("}","");
+	  jjtThis.upperBound=Integer.parseInt(s);jjtThis.lowerBound=Integer.parseInt(s);}|
+
+	t=< QUANTIFIER_NRTOUNBOUND >{
+		s=t.image;
+		s=s.replace("{","");
+		s=s.replace("{","");
+		s=s.replace(",","");
+	  jjtThis.upperBound=Integer.MAX_VALUE;jjtThis.lowerBound=Integer.parseInt(s);}|
+
+	t=< QUANTIFIER_NRTONR >{
+		s=t.image;
+		s=s.replace("{","");
+		s=s.replace("}","");
+		String[] split =s.split(",");
+	  jjtThis.upperBound=Integer.parseInt(split[1]);jjtThis.lowerBound=Integer.parseInt(split[0]);}	
+
+   )?
+
+ ) {System.out.print("{"+jjtThis.lowerBound+","+jjtThis.upperBound+"}");}
+ }
+
+
+/*
+void Terminal() #void:{SimpleNode quantified;SimpleNode quantifier;}{
+
+	(
+		((quantified=ID_Node()|"("quantified=Expression()")")quantifier=Quantifier()#Quantifier(1))
+			| 
+		(quantified=ID_Node()#ID(0)|"("quantified=Expression()")")	
+	)
+
+	
+	{		if(quantifier!=null)//return quantifier;
+		else return quantified;
+	}
+
+	
+  }
+*/
+/*
+void Quantifier() :{Token quant;String str;}{
 	(	  < QUANTIFIER_ANY >	{		jjtThis.lowerBound=0;
 		jjtThis.upperBound=Integer.MAX_VALUE;
 
@@ -65,9 +145,9 @@ SimpleNode Quantifier(SimpleNode objectQuantified) :{Token quant;String str;}{
 
 	})
 
-	{
-	  	jjtThis.quantified=objectQuantified;		return jjtThis;
+	{		//return jjtThis;
 	}
 	
 
 }
+*/

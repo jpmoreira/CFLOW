@@ -7,7 +7,6 @@ class ASTQuantifier extends SimpleNode {
 	
 	public int lowerBound;
 	public int upperBound;
-	public SimpleNode quantified;
   public ASTQuantifier(int id) {
     super(id);
   }

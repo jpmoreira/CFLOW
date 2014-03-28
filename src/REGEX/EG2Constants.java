@@ -11,21 +11,29 @@ public interface EG2Constants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int INTEGER = 7;
+  int INTEGER = 4;
   /** RegularExpression Id. */
-  int ID = 8;
+  int ID = 5;
   /** RegularExpression Id. */
-  int QUANTIFIER_ANY = 9;
+  int QUANTIFIER_ANY = 6;
   /** RegularExpression Id. */
-  int QUANTIFIER_ONEORMORE = 10;
+  int QUANTIFIER_ONEORMORE = 7;
   /** RegularExpression Id. */
-  int QUANTIFIER_ZEROORONE = 11;
+  int QUANTIFIER_ZEROORONE = 8;
   /** RegularExpression Id. */
-  int QUANTIFIER_NRFIXED = 12;
+  int QUANTIFIER_NRFIXED = 9;
   /** RegularExpression Id. */
-  int QUANTIFIER_NRTOUNBOUND = 13;
+  int QUANTIFIER_NRTOUNBOUND = 10;
   /** RegularExpression Id. */
-  int QUANTIFIER_NRTONR = 14;
+  int QUANTIFIER_NRTONR = 11;
+  /** RegularExpression Id. */
+  int LP = 12;
+  /** RegularExpression Id. */
+  int RP = 13;
+  /** RegularExpression Id. */
+  int DOT = 14;
+  /** RegularExpression Id. */
+  int LF = 15;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -34,11 +42,8 @@ public interface EG2Constants {
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
     "\"\\r\"",
-    "<token of kind 5>",
-    "<token of kind 6>",
+    "\"\\t\"",
     "<INTEGER>",
     "<ID>",
     "\"*\"",
@@ -47,6 +52,11 @@ public interface EG2Constants {
     "<QUANTIFIER_NRFIXED>",
     "<QUANTIFIER_NRTOUNBOUND>",
     "<QUANTIFIER_NRTONR>",
+    "\"(\"",
+    "\")\"",
+    "\".\"",
+    "\"\\n\"",
+    "\"|\"",
   };
 
 }

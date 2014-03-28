@@ -4,12 +4,20 @@ package REGEX;
 public interface EG2TreeConstants
 {
   public int JJTREGEX = 0;
-  public int JJTQUANTIFIER = 1;
+  public int JJTID_NODE = 1;
+  public int JJTVOID = 2;
+  public int JJTOR = 3;
+  public int JJTCONCAT = 4;
+  public int JJTTERMINAL = 5;
 
 
   public String[] jjtNodeName = {
     "Regex",
-    "Quantifier",
+    "ID_Node",
+    "void",
+    "OR",
+    "CONCAT",
+    "Terminal",
   };
 }
-/* JavaCC - OriginalChecksum=3accc97ba675e98bcf63839eb2252b97 (do not edit this line) */
+/* JavaCC - OriginalChecksum=28af4a822bb653d15517367bf57a0c0a (do not edit this line) */

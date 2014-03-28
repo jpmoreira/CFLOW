@@ -5,6 +5,16 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   protected static JJTEG2State jjtree = new JJTEG2State();public static void main(String args [])
   {
 
+    try
+    {
+      EG2 obj=new EG2(System.in);
+        SimpleNode s=obj.Regex();
+        s.dump("");
+    }
+    catch(ParseException e)
+    {
+    }
+
   }
 
   static final public SimpleNode Regex() throws ParseException {
@@ -13,7 +23,11 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      Quantifier(null);
+      Expression();
+      jj_consume_token(LF);
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  {if (true) return jjtn000;}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -36,68 +50,230 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     throw new Error("Missing return statement in function");
   }
 
-  static final public SimpleNode Quantifier(SimpleNode objectQuantified) throws ParseException {
-                                                     /*@bgen(jjtree) Quantifier */
-                                                     ASTQuantifier jjtn000 = new ASTQuantifier(JJTQUANTIFIER);
-                                                     boolean jjtc000 = true;
-                                                     jjtree.openNodeScope(jjtn000);Token quant;String str;
+  static final public void ID_Node() throws ParseException {
+                /*@bgen(jjtree) ID_Node */
+                ASTID_Node jjtn000 = new ASTID_Node(JJTID_NODE);
+                boolean jjtc000 = true;
+                jjtree.openNodeScope(jjtn000);Token t;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case QUANTIFIER_ANY:
-        jj_consume_token(QUANTIFIER_ANY);
-                jjtn000.lowerBound=0;
-                jjtn000.upperBound=Integer.MAX_VALUE;
-        break;
-      case QUANTIFIER_ONEORMORE:
-        jj_consume_token(QUANTIFIER_ONEORMORE);
-                jjtn000.lowerBound=1;
-                jjtn000.upperBound=Integer.MAX_VALUE;
-        break;
-      case QUANTIFIER_ZEROORONE:
-        jj_consume_token(QUANTIFIER_ZEROORONE);
-                jjtn000.lowerBound=0;
-                jjtn000.upperBound=1;
-        break;
-      case QUANTIFIER_NRFIXED:
-        quant = jj_consume_token(QUANTIFIER_NRFIXED);
-                str=quant.image;
-                str=str.replaceAll("{","");
-                str=str.replaceAll("}","");
-                jjtn000.lowerBound=Integer.parseInt(str);
-                jjtn000.upperBound=Integer.parseInt(str);
-        break;
-      case QUANTIFIER_NRTOUNBOUND:
-        quant = jj_consume_token(QUANTIFIER_NRTOUNBOUND);
-                str=quant.image;
-                str=str.replaceAll("{","");
-                str=str.replaceAll("}","");
-                jjtn000.lowerBound=Integer.parseInt(str);
-                jjtn000.upperBound=Integer.MAX_VALUE;
-        break;
-      case QUANTIFIER_NRTONR:
-        quant = jj_consume_token(QUANTIFIER_NRTONR);
-                str=quant.image;
-                str=str.replaceAll("{","");
-                str=str.replaceAll("}","");
-                String [] nrs=str.split(",");
-                jjtn000.lowerBound=Integer.parseInt(nrs[0]);
-                jjtn000.upperBound=Integer.parseInt(nrs[1]);
-        break;
-      default:
-        jj_la1[0] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
+      token = jj_consume_token(ID);
           jjtree.closeNodeScope(jjtn000, true);
           jjtc000 = false;
-                jjtn000.quantified=objectQuantified;
-                {if (true) return jjtn000;}
+          jjtn000.identifier=token.image.replace("\u005c"","");
     } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
           }
     }
-    throw new Error("Missing return statement in function");
+  }
+
+  static final public void Expression() throws ParseException {
+                        int nrChilds=1;
+    Group();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case 16:
+               ASTOR jjtn001 = new ASTOR(JJTOR);
+               boolean jjtc001 = true;
+               jjtree.openNodeScope(jjtn001);
+      try {
+        label_1:
+        while (true) {
+          jj_consume_token(16);
+          Group();
+                         nrChilds++;
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case 16:
+            ;
+            break;
+          default:
+            jj_la1[0] = jj_gen;
+            break label_1;
+          }
+        }
+      } catch (Throwable jjte001) {
+               if (jjtc001) {
+                 jjtree.clearNodeScope(jjtn001);
+                 jjtc001 = false;
+               } else {
+                 jjtree.popNode();
+               }
+               if (jjte001 instanceof RuntimeException) {
+                 {if (true) throw (RuntimeException)jjte001;}
+               }
+               if (jjte001 instanceof ParseException) {
+                 {if (true) throw (ParseException)jjte001;}
+               }
+               {if (true) throw (Error)jjte001;}
+      } finally {
+               if (jjtc001) {
+                 jjtree.closeNodeScope(jjtn001,  nrChilds);
+               }
+      }
+      break;
+    default:
+      jj_la1[1] = jj_gen;
+      ;
+    }
+  }
+
+  static final public void Group() throws ParseException {
+                   int nrChilds=1;
+    Terminal();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case ID:
+    case LP:
+    case DOT:
+                     ASTCONCAT jjtn001 = new ASTCONCAT(JJTCONCAT);
+                     boolean jjtc001 = true;
+                     jjtree.openNodeScope(jjtn001);
+      try {
+        label_2:
+        while (true) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case DOT:
+            jj_consume_token(DOT);
+            break;
+          default:
+            jj_la1[2] = jj_gen;
+            ;
+          }
+          Terminal();
+                                       nrChilds++;
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case ID:
+          case LP:
+          case DOT:
+            ;
+            break;
+          default:
+            jj_la1[3] = jj_gen;
+            break label_2;
+          }
+        }
+      } catch (Throwable jjte001) {
+                     if (jjtc001) {
+                       jjtree.clearNodeScope(jjtn001);
+                       jjtc001 = false;
+                     } else {
+                       jjtree.popNode();
+                     }
+                     if (jjte001 instanceof RuntimeException) {
+                       {if (true) throw (RuntimeException)jjte001;}
+                     }
+                     if (jjte001 instanceof ParseException) {
+                       {if (true) throw (ParseException)jjte001;}
+                     }
+                     {if (true) throw (Error)jjte001;}
+      } finally {
+                     if (jjtc001) {
+                       jjtree.closeNodeScope(jjtn001,  nrChilds);
+                     }
+      }
+      break;
+    default:
+      jj_la1[4] = jj_gen;
+      ;
+    }
+  }
+
+  static final public void Terminal() throws ParseException {
+                 /*@bgen(jjtree) Terminal */
+                 ASTTerminal jjtn000 = new ASTTerminal(JJTTERMINAL);
+                 boolean jjtc000 = true;
+                 jjtree.openNodeScope(jjtn000);Token t;String s;String id;Token idToken;
+    try {
+   jjtn000.upperBound=1;jjtn000.lowerBound=1;
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ID:
+        idToken = jj_consume_token(ID);
+    jjtn000.isTrueTerminal=true;id=idToken.image;id=id.replace("\u005c"","");jjtn000.idString=id;
+        break;
+      case LP:
+        jj_consume_token(LP);
+        Expression();
+        jj_consume_token(RP);
+    jjtn000.isTrueTerminal=false;
+        break;
+      default:
+        jj_la1[5] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case QUANTIFIER_ANY:
+      case QUANTIFIER_ONEORMORE:
+      case QUANTIFIER_ZEROORONE:
+      case QUANTIFIER_NRFIXED:
+      case QUANTIFIER_NRTOUNBOUND:
+      case QUANTIFIER_NRTONR:
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case QUANTIFIER_ANY:
+          jj_consume_token(QUANTIFIER_ANY);
+                      jjtn000.upperBound=Integer.MAX_VALUE;jjtn000.lowerBound=0;
+          break;
+        case QUANTIFIER_ONEORMORE:
+          jj_consume_token(QUANTIFIER_ONEORMORE);
+                                 jjtn000.upperBound=Integer.MAX_VALUE;jjtn000.lowerBound=1;
+          break;
+        case QUANTIFIER_ZEROORONE:
+          jj_consume_token(QUANTIFIER_ZEROORONE);
+                                 jjtn000.upperBound=1;jjtn000.lowerBound=0;
+          break;
+        case QUANTIFIER_NRFIXED:
+          t = jj_consume_token(QUANTIFIER_NRFIXED);
+                s=t.image;
+                s=s.replace("{","");
+                s=s.replace("}","");
+          jjtn000.upperBound=Integer.parseInt(s);jjtn000.lowerBound=Integer.parseInt(s);
+          break;
+        case QUANTIFIER_NRTOUNBOUND:
+          t = jj_consume_token(QUANTIFIER_NRTOUNBOUND);
+                s=t.image;
+                s=s.replace("{","");
+                s=s.replace("{","");
+                s=s.replace(",","");
+          jjtn000.upperBound=Integer.MAX_VALUE;jjtn000.lowerBound=Integer.parseInt(s);
+          break;
+        case QUANTIFIER_NRTONR:
+          t = jj_consume_token(QUANTIFIER_NRTONR);
+                s=t.image;
+                s=s.replace("{","");
+                s=s.replace("}","");
+                String[] split =s.split(",");
+          jjtn000.upperBound=Integer.parseInt(split[1]);jjtn000.lowerBound=Integer.parseInt(split[0]);
+          break;
+        default:
+          jj_la1[6] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        ;
+      }
+   jjtree.closeNodeScope(jjtn000, true);
+   jjtc000 = false;
+  System.out.print("{"+jjtn000.lowerBound+","+jjtn000.upperBound+"}");
+    } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      {if (true) throw (RuntimeException)jjte000;}
+    }
+    if (jjte000 instanceof ParseException) {
+      {if (true) throw (ParseException)jjte000;}
+    }
+    {if (true) throw (Error)jjte000;}
+    } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+    }
   }
 
   static private boolean jj_initialized_once = false;
@@ -110,13 +286,13 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[1];
+  static final private int[] jj_la1 = new int[8];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x7e00,};
+      jj_la1_0 = new int[] {0x10000,0x10000,0x4000,0x5020,0x5020,0x1020,0xfc0,0xfc0,};
    }
 
   /** Constructor with InputStream. */
@@ -137,7 +313,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -152,7 +328,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -169,7 +345,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -180,7 +356,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -196,7 +372,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -206,7 +382,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -257,12 +433,12 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[15];
+    boolean[] la1tokens = new boolean[17];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 8; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -271,7 +447,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
         }
       }
     }
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 17; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
