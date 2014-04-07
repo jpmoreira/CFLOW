@@ -87,67 +87,10 @@ void Terminal():{Token t;String s;String id;Token idToken;}{
 		String[] split =s.split(",");
 	  jjtThis.upperBound=Integer.parseInt(split[1]);jjtThis.lowerBound=Integer.parseInt(split[0]);}	
 
-   )?
+ )?
 
- ) {System.out.print("{"+jjtThis.lowerBound+","+jjtThis.upperBound+"}");}
+ ) 
  }
 
 
-/*
-void Terminal() #void:{SimpleNode quantified;SimpleNode quantifier;}{
 
-	(
-		((quantified=ID_Node()|"("quantified=Expression()")")quantifier=Quantifier()#Quantifier(1))
-			| 
-		(quantified=ID_Node()#ID(0)|"("quantified=Expression()")")	
-	)
-
-	
-	{		if(quantifier!=null)//return quantifier;
-		else return quantified;
-	}
-
-	
-  }
-*/
-/*
-void Quantifier() :{Token quant;String str;}{
-	(	  < QUANTIFIER_ANY >	{		jjtThis.lowerBound=0;
-		jjtThis.upperBound=Integer.MAX_VALUE;
-
-	}|
-	< QUANTIFIER_ONEORMORE >	{		jjtThis.lowerBound=1;
-		jjtThis.upperBound=Integer.MAX_VALUE;
-
-	}|
-	< QUANTIFIER_ZEROORONE >	{		jjtThis.lowerBound=0;
-		jjtThis.upperBound=1;
-	}|
-	quant=< QUANTIFIER_NRFIXED  >	{
-	  	str=quant.image;
-	  	str=str.replaceAll("{","");
-	  	str=str.replaceAll("}","");		jjtThis.lowerBound=Integer.parseInt(str);
-		jjtThis.upperBound=Integer.parseInt(str);
-
-	}|
-	quant=< QUANTIFIER_NRTOUNBOUND >	{		str=quant.image;
-	  	str=str.replaceAll("{","");
-	  	str=str.replaceAll("}","");
-		jjtThis.lowerBound=Integer.parseInt(str);
-		jjtThis.upperBound=Integer.MAX_VALUE;
-	}|
-	quant=< QUANTIFIER_NRTONR >	{		str=quant.image;
-	  	str=str.replaceAll("{","");
-	  	str=str.replaceAll("}","");
-	  	String [] nrs=str.split(",");
-		jjtThis.lowerBound=Integer.parseInt(nrs[0]);
-		jjtThis.upperBound=Integer.parseInt(nrs[1]);
-
-	})
-
-	{		//return jjtThis;
-	}
-	
-
-}
-*/

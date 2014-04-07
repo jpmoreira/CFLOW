@@ -252,9 +252,6 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
         jj_la1[7] = jj_gen;
         ;
       }
-   jjtree.closeNodeScope(jjtn000, true);
-   jjtc000 = false;
-  System.out.print("{"+jjtn000.lowerBound+","+jjtn000.upperBound+"}");
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
