@@ -1,0 +1,16 @@
+package AnnotationGrammar;
+
+ 
+public
+class AST_Annot extends SimpleNode {
+  public AST_Annot(int id) {
+  	@CFLOW id
+    super(id);
+  }
+
+  public AST_Annot(AnnotationParser p, int id) {
+  	@CFLOW id2     
+    super(p, id);
+  }
+
+}

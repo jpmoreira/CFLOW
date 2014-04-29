@@ -1,0 +1,103 @@
+/**
+ * JJTree template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  JDK_VERSION = "1.5";
+  static = false;
+  MULTI = true;
+}
+
+PARSER_BEGIN(AnnotationParser)
+package AnnotationGrammar;
+
+public class AnnotationParser
+{
+  public static void main(String args []) throws Exception
+  {
+	/*	
+	  	SimpleCharStream stream=new SimpleCharStream(System.in,null,1,1);
+	  	AnnotationParserTokenManager tokenManager=new AnnotationParserTokenManager(stream);
+
+
+		Token currentToken=tokenManager.getNextToken();
+		while(currentToken.kind!= EOF){
+
+		switch(currentToken.kind)		{			case EOF:
+				System.out.println("< EOF >");
+				break;
+			case ID:
+				System.out.println("< ID >");
+				break;
+			case LF:
+				System.out.println("< LF >");
+				break;
+  			case CFLOW_TAG:
+  				System.out.println("< CFLOW_TAG >");
+  				break;
+  			default:
+  				System.out.println("< ANY >");
+  				break;
+		}
+		currentToken=tokenManager.getNextToken();
+  		}
+	*/
+	
+		AnnotationParser obj=new AnnotationParser(System.in);
+    	SimpleNode s=obj.Annotations();
+    	s.dump("");
+	
+    	
+	}
+}
+
+PARSER_END(AnnotationParser)
+
+SKIP :
+{
+ "\r" | "\t" | " "
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  	
+	< ID : ["A"- "Z","a"-"z"](["0"-"9","a"-"z","A"-"Z"])* > |
+
+	< LF: "\n" >|
+
+	< CFLOW_TAG: "@CFLOW " >|
+	
+	< ANY: ~[] >//matches any character
+
+	
+}	
+
+	
+
+
+	
+	
+SimpleNode Annotations():{}
+{
+	(< ANY >|< ID >|Cflow()|< LF >)*
+
+	{return jjtThis;}
+}
+
+
+SimpleNode Cflow() :
+{Token current;}
+{	current=< CFLOW_TAG >	{
+	  jjtThis.beginLine=current.beginLine;jjtThis.beginColumn=current.beginColumn;	}
+	<ID >
+	current=<LF >	{
+	  jjtThis.endLine=current.endLine;jjtThis.endColumn=current.endColumn;	}
+
+
+	{
+	  return jjtThis;	}
+}
+
+
+
+
