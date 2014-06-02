@@ -110,7 +110,8 @@ public class AnnotationParser/*@bgen(jjtree)*/implements AnnotationParserTreeCon
     try {
       current = jj_consume_token(CFLOW_TAG);
           jjtn000.beginLine=current.beginLine;jjtn000.beginColumn=current.beginColumn;
-      jj_consume_token(ID);
+      current = jj_consume_token(ID);
+         jjtn000.theID=current.image;
       current = jj_consume_token(LF);
           jjtn000.endLine=current.endLine;jjtn000.endColumn=current.endColumn;
           jjtree.closeNodeScope(jjtn000, true);

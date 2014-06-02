@@ -89,7 +89,7 @@ SimpleNode Cflow() :
 {Token current;}
 {	current=< CFLOW_TAG >	{
 	  jjtThis.beginLine=current.beginLine;jjtThis.beginColumn=current.beginColumn;	}
-	<ID >
+	current=<ID >	{jjtThis.theID=current.image;}
 	current=<LF >	{
 	  jjtThis.endLine=current.endLine;jjtThis.endColumn=current.endColumn;	}
 

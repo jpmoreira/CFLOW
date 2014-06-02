@@ -15,31 +15,51 @@ import AnnotationGrammar.ParseException;
 import AnnotationGrammar.SimpleNode;
 
 public class AnnotationParserTest {
-	
+
 	public static InputStream reteriveByteArrayInputStream(String fileName) {
 
-		
-		return AnnotationParserTest.class.getResourceAsStream("/Testes/input1");
-		
+
+		return AnnotationParserTest.class.getResourceAsStream("/Testes/"+fileName);
+
 
 	}
 
 	@Test
-	public void test() {
+	public void test1() {
 		try {
 			
 			InputStream stream = AnnotationParserTest.reteriveByteArrayInputStream("input1");
 			
-			AnnotationParser obj=new AnnotationParser(stream);
-	    	SimpleNode s=obj.Annotations();
-	    	s.dump("");
-	    	
+			AnnotationParser obj=new AnnotationParser(stream,"UTF-8");
+			SimpleNode s=obj.Annotations();
+			s.dump("");
+			
 			
 			assertEquals("", "");
 		} catch (ParseException e) {
 			fail("exception thrown but shouldnt");
+			
+		}
 		
 	}
+	@Test
+	public void test2() {
+		try {
 
-}
+			InputStream stream = AnnotationParserTest.reteriveByteArrayInputStream("input2");
+
+			AnnotationParser obj=new AnnotationParser(stream);
+			SimpleNode s=obj.Annotations();
+			s.dump("");
+
+
+			assertEquals("", "");
+		} catch (ParseException e) {
+			fail("exception thrown but shouldnt");
+
+		}
+
+	}
+
+	
 }
