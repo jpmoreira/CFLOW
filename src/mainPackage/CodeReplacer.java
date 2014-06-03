@@ -18,6 +18,9 @@ public class CodeReplacer {
 	
 	private final String callStart="Automaton.consume(\"";
 	private final String callEnd="\");\n";
+	private final String importStatement="import Automaton;\n";
+	
+	private int lineNumber=1;
 	
 	
 	
@@ -28,10 +31,10 @@ public class CodeReplacer {
 	
 	public void replaceCflowTags(String inputFile,String outputFile) throws IOException{
 		
+		lineNumber=1;
 		BufferedReader reader=new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
 		
-		String input="";
-		String temp="";
+		String input=importStatement;
 		int readChar;
 		char c;
 		
@@ -40,6 +43,7 @@ public class CodeReplacer {
 		while(readChar!=-1){
 			
 			c=(char)readChar;
+			if(c=='\n')lineNumber++;
 			if(c=='@'){
 				input+=attemptReplacement(reader);
 			}
@@ -78,13 +82,17 @@ public class CodeReplacer {
 			c=(char)output;
 			potentialCflowTag+=c;
 		}
+		
+		
 		if(potentialCflowTag.matches("@CFLOW\\s*[a-zA-Z]\\w*\\s*\n")){
 			
 			potentialCflowTag=potentialCflowTag.replace("@CFLOW","");
 			potentialCflowTag=potentialCflowTag.replaceAll("\\s+", "");
 			potentialCflowTag=potentialCflowTag.replace("\n","");
-			potentialCflowTag=callStart+potentialCflowTag+callEnd;
+			potentialCflowTag=callStart+potentialCflowTag+","+lineNumber+callEnd;
 		}
+		
+		if(c=='\n')lineNumber++;
 		
 		
 		

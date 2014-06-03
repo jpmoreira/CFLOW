@@ -20,6 +20,34 @@ public class Cflow {
 	public static void main(String[] args) {
 		
 		
+		/***
+		 * 
+		 * 
+		 * CLFOW -source 3 a.java b.java c.java -compiler " some parameters"
+		 * 
+		 * 
+		 * javac "some parameters "
+		 * 
+		 * 
+		 */
+		
+		/*
+		 * 
+		 * Get Source files
+		 * Replace COde in source files
+		 * Append Automata source file
+		 * How to use java compiler http://stackoverflow.com/questions/2946338/how-do-i-programmatically-compile-and-instantiate-a-java-class
+		 * Launch program in another process
+		 * Verificar o termino
+		 * Desserializar classe automato
+		 * Verificar estado 
+		 * Mostrar output
+		 * 
+		 * 
+		 * 
+		 * 
+		 * */
+		
 		
 
 	}
