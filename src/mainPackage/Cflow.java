@@ -1,5 +1,6 @@
 package mainPackage;
 
+import java.awt.List;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,10 +12,13 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.print.DocFlavor.URL;
 import javax.xml.crypto.KeySelector.Purpose;
 
+import automaton.Automaton;
+import automaton.State;
 import REGEX.EG2;
 import REGEX.ParseException;
 import REGEX.SimpleNode;
@@ -33,8 +37,7 @@ public class Cflow {
 	
 	static private final String tempDirectoryName="_cflow_tmp";
 	static private final String executionDirectoryName="_cflow_bin";
-	static private final String tempFilePrefix="_cflow_";
-	static private final String automataClassName="Automat";
+	static private final String[] automataClassFiles={Automaton.class.getResource("Automaton.class").getPath(),State.class.getResource("State.class").getPath()};
 	
 	static File tempDirectory=null;
 	
@@ -104,15 +107,19 @@ public class Cflow {
 		}
 		
 		
-		try{
-			copyFilesToTmpDir(sourceFiles);
-		}catch(IOException e){
-			System.out.println("Error creating copy of files");
-			return;
+		if(!copyFilesToTmpDir(sourceFiles))return;
+		
+		if(!copyAutomataAndRelatedClassesToTempFolder())return;
+		
+		try {
+			compile(sourceFiles);
+		} catch (IOException e) {
+			System.out.println("Unable To Compile");
+		} catch (InterruptedException e) {
+			System.out.println("Unable to compile");
 		}
 		
-		
-		removeTempDirAndContent();
+		//removeTempDirAndContent();
 
 	}
 	
@@ -168,7 +175,7 @@ public class Cflow {
 	private static boolean verifyFiles(String[] sourceFiles){
 		
 		for (String fileName : sourceFiles) {
-			File f=fileWithName(fileName);
+			File f=fileInCurrentDirectoryWithName(fileName);
 			if(f==null || !f.exists() || !f.isFile()){
 				System.out.println("File : "+fileName+" does not exist.");
 				return false;
@@ -177,33 +184,29 @@ public class Cflow {
 		return true;
 	} 
 	
-	private static void copyFilesToTmpDir(String[] sources) throws IOException{
+	private static boolean copyFilesToTmpDir(String[] sources){
 		
 		
 		tempDirectory=createDirectoryWithName(tempDirectoryName);
 		 
 		 for (String sourceName : sources) {
-			 String tmpFileName=tempDirectoryName+"/"+tempFilePrefix+sourceName;
+			 String tmpFileName=tempDirectoryName+"/"+sourceName;
 			 InputStream is = null;
 			 OutputStream os = null;
-			 File outputFile=fileWithName(tmpFileName);
-			 outputFile.createNewFile();
-			 try {
+			 File inputFile=fileInCurrentDirectoryWithName(sourceName);
+			 File outputFile=fileInCurrentDirectoryWithName(tmpFileName);
+			 try{
 				 
-				 is = new FileInputStream(fileWithName(sourceName));
-				 os = new FileOutputStream(outputFile);
-				 byte[] buffer = new byte[1024];
-				 int length;
-				 while ((length = is.read(buffer)) > 0) {
-					 os.write(buffer, 0, length);
-				 }
-			 } finally {
-				 is.close();
-				 os.close();
+				 copyFile(inputFile, outputFile);				 
+			 }catch(IOException e){
+				 System.out.println("Error moving files to temp directory");
+				 return false;
 			 }
+			 
 			 
 			
 		}
+		 return true;
 		
 	}
 	private static void printUsage(){
@@ -215,7 +218,7 @@ public class Cflow {
 		System.out.println("	CFLOW \"<REGEX>\" -source <file1.java> <file2.java> <...> <filen.java> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" ");
 	}
 	
-	private static File fileWithName(String name){
+	private static File fileInCurrentDirectoryWithName(String name){
 		
 		
 		String path=System.getProperty("user.dir");
@@ -254,4 +257,81 @@ public class Cflow {
 		tempDirectory.deleteOnExit();
 		
 	}
+	
+	private static boolean copyAutomataAndRelatedClassesToTempFolder(){
+		
+		
+		for (String classFile : automataClassFiles) {
+			File inputFile=new File(classFile);
+			String[] classFileNames=classFile.split("/");
+			String classFileName=classFileNames[classFileNames.length-1];
+			
+			File output=fileInCurrentDirectoryWithName(tempDirectoryName+"/"+classFileName);
+			try {
+				copyFile(inputFile, output);
+			} catch (IOException e) {
+				System.out.println("Unable To move automata class file");
+				return false;
+			}
+			
+		
+			
+		}
+		return true;
+	}
+	
+	private static void copyFile(File source,File dest) throws IOException{
+		FileInputStream in=null;
+		FileOutputStream out=null;
+		
+		try {
+			in = new FileInputStream(source);
+			out = new FileOutputStream(dest);
+			byte[] buffer = new byte[1024];
+			 int length;
+			 while ((length = in.read(buffer)) > 0)out.write(buffer, 0, length);
+			
+		} finally{
+			
+			in.close();
+			out.close();
+		}
+		 
+		
+	}
+		
+	private static void compile(String[] sources) throws IOException, InterruptedException{
+		
+		ArrayList<String> l=new ArrayList<String>();
+		l.add("javac");
+		//l.add("-classpath "+"\""+tempDirectory.getAbsolutePath()+"\"");
+		//l.add("-d "+tempDirectory.getAbsolutePath());
+		for (String sourceFile : sources) {
+			l.add(sourceFile);
+		}
+		
+		
+		
+		Runtime rt = Runtime.getRuntime();
+		Process proc = rt.exec(l.toArray(new String[l.size()]));
+		//output both stdout and stderr data from proc to stdout of this process
+		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
+		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
+		errorGobbler.start();
+		outputGobbler.start();
+		proc.waitFor();
+		
+		
+		
+		
+		
+		
+	}
+	static void copy(InputStream in, OutputStream out) throws IOException {
+	    while (true) {
+	      int c = in.read();
+	      if (c == -1) break;
+	      out.write((char)c);
+	    }
+	  }
 }
