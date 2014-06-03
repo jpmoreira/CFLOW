@@ -1,5 +1,6 @@
 package Testes;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import org.junit.After;
@@ -10,162 +11,60 @@ import automaton.Automaton;
 import automaton.State;
 
 public class AutomatonTest {
-
-	State[]  transitionTable ;
 	
-	Automaton automaton;
-
+	
+	State[]  transitionTable ;
 
 
 	@Before
 	public void setUp() throws Exception {
 
-		State st0 = new State() {
-
-			@Override
-			public HashMap<String, Integer> validStates() {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("ab", 1);
-				temp.put("ef", 3);
-
-				return temp;
-			}
-
-			@Override
-			public int nextState(String input) {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("ab", 1);
-				temp.put("ef", 3);
-				
-				if (temp.get(input) == null) return -1;
-				return temp.get(input);
-			}
-
-			@Override
-			public Boolean isFinal() {
-				return false;
-			}
-		};
+		
+		
+		HashMap<String, Integer> tempHash = new HashMap<String, Integer>();
+		tempHash.put("ab", 1);
+		tempHash.put("ef", 3);
+		
+		State st0 = new MyState(tempHash, false);
 		
 		
 		
+		tempHash = new HashMap<String, Integer>();
+		tempHash.put("ab", 1);
+		tempHash.put("cd", 2);
 
-		State st1 = new State() {
-
-			@Override
-			public HashMap<String, Integer> validStates() {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("ab", 1);
-				temp.put("cd", 2);
-
-				return temp;
-			}
-
-			@Override
-			public int nextState(String input) {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("ab", 1);
-				temp.put("cd", 2);
-				
-				if (temp.get(input)	== null) return -1;
-				return temp.get(input);
-			}
-
-			@Override
-			public Boolean isFinal() {
-				return false;
-			}
-		};
+		State st1 = new MyState(tempHash, false);
 		
 		
 		
+		tempHash = new HashMap<String, Integer>();
+		tempHash.put("ef", 3);
+
+		State st2 = new MyState(tempHash, true);
+			
 		
-		State st2 = new State() {
-
-			@Override
-			public HashMap<String, Integer> validStates() {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("ef", 3);
-
-				return temp;
-			}
-
-			@Override
-			public int nextState(String input) {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("ef", 3);
-				
-				if (temp.get(input)	== null) return -1;
-				return temp.get(input);
-			}
-
-			@Override
-			public Boolean isFinal() {
-				return true;
-			}
-		};
+		tempHash = new HashMap<String, Integer>();
+		tempHash.put("g", 4);
 		
-		State st3 = new State() {
-
-			@Override
-			public HashMap<String, Integer> validStates() {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("g", 4);
-
-				return temp;
-			}
-
-			@Override
-			public int nextState(String input) {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				temp.put("g", 4);
-
-				if (temp.get(input)	== null) return -1;
-				return temp.get(input);
-			}
-
-			@Override
-			public Boolean isFinal() {
-				return false;
-			}
-		};
+		State st3 = new MyState(tempHash, false);
 		
-		State st4 = new State() {
-
-			@Override
-			public HashMap<String, Integer> validStates() {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-
-				return temp;
-			}
-
-			@Override
-			public int nextState(String input) {
-				HashMap<String, Integer> temp = new HashMap<String, Integer>();
-				
-				return -1;
-			}
-
-			@Override
-			public Boolean isFinal() {
-				return true;
-			}
-		};
-
-
+		
+		
+		tempHash = new HashMap<String, Integer>();
+		
+		State st4 = new MyState(tempHash, true);
+		
+		
 		transitionTable = new State[] {st0,st1,st2,st3,st4};
 		
-		automaton = Automaton.getAutomaton();
-
-		Automaton.initializeAutomaton(transitionTable);
-
+		Automaton.getAutomaton(transitionTable);
 
 	}
 	
 	@After
 	public void tearDown(){
 		
-		automaton = null;
+		Automaton.resetAutomaton();
 		
 	}
 
@@ -174,11 +73,13 @@ public class AutomatonTest {
 	@Test
 	public void transitionTest_01(){
 
+		System.out.println();
+		
 		String[] flow = {"ab","cd","ef","g"};
 
 		for (String flowPoint: flow) {
 
-			automaton.consume(flowPoint);
+			Automaton.consume(flowPoint);
 
 		}
 		
@@ -189,13 +90,30 @@ public class AutomatonTest {
 	@Test
 	public void transitionTest_02(){
 
-		
+		System.out.println();
 
 		String[] flow = {"ef", "cd","ab","g"};
 
 		for (String flowPoint: flow) {
 
-			automaton.consume(flowPoint);
+			Automaton.consume(flowPoint);
+
+		}
+		
+		Automaton.validateResult();
+
+	}
+	
+	@Test
+	public void transitionTest_03(){
+
+		System.out.println();
+
+		String[] flow = {"ef"};
+
+		for (String flowPoint: flow) {
+
+			Automaton.consume(flowPoint);
 
 		}
 		
