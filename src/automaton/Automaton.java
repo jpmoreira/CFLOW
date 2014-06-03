@@ -69,22 +69,12 @@ public class Automaton implements Serializable{
 
 	public void consume(String input){
 
-//		System.out.print("Flow control point: " + input + "\n");
-
-
-
 		int inputIndex = mapInputToCol(input);
 
 		Automaton.currentState = transition[currentState][inputIndex];
 
 		Automaton.flowInput.add(input);
 		Automaton.flowResult.add(stateAction[currentState]);
-
-
-
-
-//		System.out.print("Transition to " + input + "\n");
-
 
 
 	}

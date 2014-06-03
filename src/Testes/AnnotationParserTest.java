@@ -48,7 +48,7 @@ public class AnnotationParserTest {
 
 			InputStream stream = AnnotationParserTest.reteriveByteArrayInputStream("input2");
 
-			AnnotationParser obj=new AnnotationParser(stream);
+			AnnotationParser obj=new AnnotationParser(stream,"UTF-8");
 			SimpleNode s=obj.Annotations();
 			s.dump("");
 
