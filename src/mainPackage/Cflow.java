@@ -1,5 +1,8 @@
 package mainPackage;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 
 
 /**
@@ -11,25 +14,37 @@ package mainPackage;
  */
 public class Cflow {
 
-	/**
-	 * 
-	 * The path to the file where the code is (to inject the code later)
-	 * 
-	 * */
-	public static String srcFilePath; 
 	
-	/**
-	 * 
-	 * The regular expression to determine the flow constraints
-	 * 
-	 * 
-	 * */
-	public static String regularExpression;
 	
 	
 	public static void main(String[] args) {
 		
+		
+		
 
+	}
+	
+	
+	private static String[] getSourceFiles(String[] args){
+		
+		int nrSources=0;
+		int firstSourceFileIndex=-1;
+		ArrayList<String> sources=new ArrayList<String>();
+		for(int i=0;i<args.length-2;i++){//-source should not be the last two arguments (number of sources should follow and then the sources itself)
+			if(args[i]=="-source"){
+				nrSources=Integer.parseInt(args[i+1]);
+				firstSourceFileIndex=i;
+				break;
+			}
+		}
+		if(firstSourceFileIndex==-1)return null;//if not found return null
+		
+		for(int i=firstSourceFileIndex;i<args.length;i++){
+			sources.add(args[i]);
+		}
+		
+		return sources.toArray(new String[nrSources]);
+		
 	}
 
 }
