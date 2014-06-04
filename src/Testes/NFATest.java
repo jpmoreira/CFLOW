@@ -1,6 +1,5 @@
 package Testes;
 
-import java.io.Serializable;
 import java.util.HashMap;
 
 import org.junit.After;
@@ -10,8 +9,8 @@ import org.junit.Test;
 import automaton.Automaton;
 import automaton.State;
 
-public class AutomatonTest {
-	
+public class NFATest {
+
 	
 	State[]  transitionTable ;
 
@@ -22,28 +21,29 @@ public class AutomatonTest {
 		
 		
 		HashMap<String, Integer[]> tempHash = new HashMap<String, Integer[]>();
-		tempHash.put("ab", new Integer[] {1});
-		tempHash.put("ef", new Integer[] {3});
+		tempHash.put("ab", new Integer[] {1,3});
+		tempHash.put("g", new Integer[] {4});
 		
 		State st0 = new MyState(tempHash, false);
 		
 		
 		
 		tempHash = new HashMap<String, Integer[]>();
-		tempHash.put("ab", new Integer[] {1});
 		tempHash.put("cd", new Integer[] {2});
+		tempHash.put("ef", new Integer[] {3});
 
 		State st1 = new MyState(tempHash, false);
 		
 		
 		
 		tempHash = new HashMap<String, Integer[]>();
-		tempHash.put("ef", new Integer[] {3});
+		tempHash.put("g", new Integer[] {4});
 
 		State st2 = new MyState(tempHash, true);
 			
 		
 		tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("ef", new Integer[] {2});
 		tempHash.put("g", new Integer[] {4});
 		
 		State st3 = new MyState(tempHash, false);
@@ -75,7 +75,7 @@ public class AutomatonTest {
 
 		System.out.println("Teste 1");
 		
-		String[] flow = {"ab","cd","ef","g"};
+		String[] flow = {"ab","cd"};
 
 		for (String flowPoint: flow) {
 
@@ -111,7 +111,7 @@ public class AutomatonTest {
 
 		System.out.println("Teste 3");
 
-		String[] flow = {"ef"};
+		String[] flow = {"ab"};
 
 		for (String flowPoint: flow) {
 
@@ -124,4 +124,5 @@ public class AutomatonTest {
 
 	}
 
+	
 }

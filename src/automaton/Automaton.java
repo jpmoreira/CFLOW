@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Automaton implements Serializable{
@@ -16,57 +18,81 @@ public class Automaton implements Serializable{
 
 	private int emptyStateIndex = -1;
 
-	private int currentState;
-	
-	private int lastValidState = 0;
-	
-	private String invalidInput;
-	
-	private String lastValidInput;
+	private Set<Integer> currentStates;
 
-	
+	private ArrayList<Integer> lastValidStates;
+
+	private ArrayList<String> invalidInput;
+
+	private String lastValidInput = "first input";
+
+
 	private Automaton(State[] transitions) {
 
 		this.transition = transitions;
 		
+		currentStates = new HashSet<Integer>();
+		currentStates.add(0);
+		
+		lastValidStates = new ArrayList<Integer>();
+		lastValidStates.add(0);
+		
+		invalidInput = new ArrayList<String>();
+
 	}
 
 
 
 	public static Automaton getAutomaton(State[] transitions) {
-		
+
 		if(transitions != null){
 
 			automaton = new Automaton(transitions);
 			return automaton;
-			
+
 		}
 		else
 			return automaton;
-		
+
 
 	}
 
 
 	public static void consume(String input){
 
-		if (automaton.currentState == automaton.emptyStateIndex) return;
+		if (automaton.currentStates.size() == 0 ) return;
 		
-		int tempState = automaton.currentState;
+		Set<Integer> tempCurrentStates = new HashSet<Integer>();
+		ArrayList<Integer> tempLastValidStates = new ArrayList<Integer>();
 
-		automaton.currentState = automaton.transition[automaton.currentState].nextState(input);
 
-		if (automaton.currentState == automaton.emptyStateIndex){
-			
-			automaton.lastValidState = tempState;
-			automaton.invalidInput = input;
-			
-		} else {
-			
-			automaton.lastValidInput = input;
+		for (int currentState : automaton.currentStates){
+
+
+			Integer[] stateAux = automaton.transition[currentState].nextState(input);
+
+			for (int st : stateAux) {
+				
+				if (st == automaton.emptyStateIndex) {
+
+					tempLastValidStates.add(currentState);
+					automaton.invalidInput.add(input);
+
+				} else {
+
+					tempLastValidStates.add(currentState);
+					tempCurrentStates.add(st);
+					automaton.lastValidInput = input;
+
+				}
+				
+			}
 			
 		}
 		
+		automaton.currentStates = tempCurrentStates;
+		automaton.lastValidStates = tempLastValidStates;
+
 		try {
 			saveFlow();
 		} catch (IOException i){
@@ -76,9 +102,9 @@ public class Automaton implements Serializable{
 
 	}
 
-	
+
 	private static void saveFlow() throws IOException {
-		
+
 		FileOutputStream fileOut = new FileOutputStream("./automaton");
 		ObjectOutputStream os = new ObjectOutputStream(fileOut);
 
@@ -87,9 +113,9 @@ public class Automaton implements Serializable{
 
 		fileOut.close();
 		os.close();	
-		
+
 	}
-	
+
 	private static void loadFlow() throws IOException, ClassNotFoundException  {
 
 		FileInputStream fileIn = new FileInputStream("./automaton");
@@ -104,7 +130,7 @@ public class Automaton implements Serializable{
 	}
 
 	public static void validateResult(){
-		
+
 		try {
 			loadFlow();
 		} catch (IOException e) {
@@ -114,48 +140,57 @@ public class Automaton implements Serializable{
 			System.out.println("Error loading automaton.");
 			e.printStackTrace();
 		}
+
 		
-		if (automaton.currentState == automaton.emptyStateIndex) {
+		if (automaton.currentStates.size() == 0) {
 			
-			System.out.println("Invalid flow at flow control point: ");
-			System.out.println("Error ocurred in flow control point: " + automaton.lastValidInput);
-			System.out.println("Invalid flow control point: " + automaton.invalidInput);
+			System.out.println("Invalid flow at:");
 			
-			expectedInput(automaton.lastValidState);
 			
-			return;
+			for (int i = 0; i < automaton.lastValidStates.size(); i++) {
+				
+				System.out.println("- flow control point \"" + automaton.lastValidInput + "\" receive a input: \"" + automaton.invalidInput.get(i) +"\"");
+
+				expectedInput(automaton.lastValidStates.get(i));
+				
+			}
 			
 		}
-		
-		if (automaton.transition[automaton.currentState].isFinal()) {			
-			System.out.println("Program ran as expected.");
-			return;
+
+		for (int currentState : automaton.currentStates){
+
+			if (automaton.transition[currentState].isFinal()) {			
+				System.out.println("Program ran as expected.");
+				break;
+			}
+
+			System.out.println("Incomplete flow.");
+			System.out.println("Program stopped at: \"" + automaton.lastValidInput + "\"");
+
+			expectedInput(currentState);
+
 		}
-		
-		System.out.println("Incomplete flow.");
-		System.out.println("Program stopped at: " + automaton.lastValidInput);
-		
-		expectedInput(automaton.currentState);
-		
-		
+
+
+
 		return;
-		
+
 	}
 
-	private static void expectedInput(int lastValidState2) {
-		
-		Set<String> validInputs = automaton.transition[lastValidState2].validStates().keySet();
-		
+	private static void expectedInput(int lastValidState) {
+
+		Set<String> validInputs = automaton.transition[lastValidState].validStates().keySet();
+
 		System.out.println("Expected inputs:");
-		
+
 		for (String s : validInputs){
-			System.out.println(s);
+			System.out.println("\"" + s + "\"");
 		}
-		
+
 	}
 
 	public static void resetAutomaton() {
 		automaton = null;
-		
+
 	}
 }
