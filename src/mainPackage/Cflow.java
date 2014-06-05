@@ -13,6 +13,7 @@ import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.print.DocFlavor.URL;
 import javax.xml.crypto.KeySelector.Purpose;
@@ -84,15 +85,32 @@ public class Cflow {
 		}
 		String regex=args[0]+"\n";
 		
-		String[] sourceFiles=getSourceFiles(args);
-		
-		if(sourceFiles.length==0){
-			System.out.println("No source files provided");
+		File sourceDir=new File(getSourceDirName(args));
+		if(!sourceDir.exists() || !sourceDir.isDirectory()){
+			System.out.println("Invalid directory choosen.");
 			printUsage();
 			return;
 		}
 		
-		if(!verifyFiles(sourceFiles))return;
+		File backupDir=createDirectoryWithAbsolutePath(sourceDir.getAbsolutePath()+"/"+tempDirectoryName);
+		
+		
+		if(shouldRestore(args)){
+			restore(sourceDir, backupDir);
+			System.out.println("Restore Sucessfull.");
+			return;
+			
+		}
+		
+		try {
+			backupSourceCodeDir(sourceDir, backupDir);
+		} catch (Exception e) {
+			System.out.println("Impossible to backup source code. Execution will be aborted");
+			return;
+		}
+		
+		
+	
 		
 		String compilerFlags=getCompilerFlags(args);
 		String executeParams=getExecuteParams(args);
@@ -107,7 +125,6 @@ public class Cflow {
 		}
 		
 		
-		if(!copyFilesToTmpDir(sourceFiles))return;
 		
 		if(!copyAutomataAndRelatedClassesToTempFolder())return;
 		
@@ -122,26 +139,82 @@ public class Cflow {
 		//removeTempDirAndContent();
 
 	}
-	
-	
-	private static String[] getSourceFiles(String[] args){
+
+	public static void restore(File sourceDir,File backupDir){
 		
-		boolean isSourceFile=false;
 		
-		ArrayList<String> sources=new ArrayList<String>();
-		for(int i=0;i<args.length;i++){
-			
-			if(isSourceFile){
-				if(args[i].matches("-.+"))break;
-				sources.add(args[i]);
+	}
+	
+	private static boolean shouldRestore(String[] args){
+		
+		for (String string : args) {
+			if(string.equals("-restore"))return true;
+		}
+		
+		return false;
+	}
+	public static void backupSourceCodeDir(File operatingItem,File backupDir) throws IOException{
+		
+
+	
+		if(operatingItem.exists() && operatingItem.isDirectory() && !operatingItem.getName().equals(tempDirectoryName)){
+			File newBackupDir=null;
+					
+			for (File item : operatingItem.listFiles()) {
+				if(newBackupDir==null)newBackupDir=createDirectoryWithAbsolutePath(backupDir.getAbsolutePath()+"/"+operatingItem.getName());
+				backupSourceCodeDir(item,newBackupDir);
 			}
+		}
+		else if (operatingItem.exists() && operatingItem.isFile()){
 			
-			else if(args[i].equals("-source"))isSourceFile=true;
+			String name=operatingItem.getName();
+			if(name.matches(".*\\.java")){
+				File copy=new File(backupDir.getAbsolutePath()+"/"+operatingItem.getName());
+				copy.createNewFile();
+				copyFile(operatingItem, copy);
+			}
+		}
+		
+	}
+	
+	
+	public static void restoreFiles(File operationItem,File backupItem) throws IOException{
+		
+		if(operationItem.isFile() && operationItem.isFile() && operationItem.getName().equals(backupItem)){
+			
+			copyFile(backupItem, operationItem);
+		}
+		if(operationItem.isDirectory() && backupItem.isDirectory() && operationItem.getName().equals(backupItem.getName())){
+			
+			for (File backup : backupItem.listFiles()) {
+				
+				for (File  originalFile : operationItem.listFiles()) {
+					
+					if(backup.getName().equals(originalFile.getName())){
+						
+						if((backup.isFile() && originalFile.isFile()) || backup.isDirectory() && originalFile.isDirectory()){
+							
+							restoreFiles(originalFile,backup);
+						}
+						
+					}
+				}
+				
+			}
 			
 		}
 		
-		return sources.toArray(new String[sources.size()]);
+	}
+	
+	public static String getSourceDirName(String[] args){
 		
+		for(int i=0;i<args.length-1;i++){
+			
+			if(args[i]=="-dir"){
+				return args[i+1];
+			}
+		}
+		return System.getProperty("user.dir");
 	}
 	
 	private static String getCompilerFlags(String[] args){
@@ -184,38 +257,16 @@ public class Cflow {
 		return true;
 	} 
 	
-	private static boolean copyFilesToTmpDir(String[] sources){
-		
-		
-		tempDirectory=createDirectoryWithName(tempDirectoryName);
-		 
-		 for (String sourceName : sources) {
-			 String tmpFileName=tempDirectoryName+"/"+sourceName;
-			 InputStream is = null;
-			 OutputStream os = null;
-			 File inputFile=fileInCurrentDirectoryWithName(sourceName);
-			 File outputFile=fileInCurrentDirectoryWithName(tmpFileName);
-			 try{
-				 
-				 copyFile(inputFile, outputFile);				 
-			 }catch(IOException e){
-				 System.out.println("Error moving files to temp directory");
-				 return false;
-			 }
-			 
-			 
-			
-		}
-		 return true;
-		
-	}
+	
 	private static void printUsage(){
 		
 		System.out.println("USAGE:");
-		System.out.println("	CFLOW \"<REGEX>\" -source <file1.java> <file2.java> <...> <filen.java>");
-		System.out.println("	CFLOW \"<REGEX>\" -source <file1.java> <file2.java> <...> <filen.java> -compiler \"<parameters to compiler>\"");
-		System.out.println("	CFLOW \"<REGEX>\" -source <file1.java> <file2.java> <...> <filen.java> -execute \"<execution parameters>\" ");
-		System.out.println("	CFLOW \"<REGEX>\" -source <file1.java> <file2.java> <...> <filen.java> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" ");
+		System.out.println("	CFLOW -restore <source directory>");
+		System.out.println("	CFLOW \"<REGEX>\"");
+		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory>");
+		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\"");
+		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -execute \"<execution parameters>\" ");
+		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" ");
 	}
 	
 	private static File fileInCurrentDirectoryWithName(String name){
@@ -234,16 +285,16 @@ public class Cflow {
 		return f;
 	}
 
-	private static File createDirectoryWithName(String name){
+
+	
+	private static File createDirectoryWithAbsolutePath(String name){
 		
-		String path=System.getProperty("user.dir");
-		path=path.concat("/"+name);
-		File f=new File(path);
+	
+		File f=new File(name);
 		if(f.isDirectory())purgeDirectory(f);
 		else f.mkdir();
 		return f;
 	}
-	
 	
 	private  static void purgeDirectory(File dir) {
 	    for (File file: dir.listFiles()) {
