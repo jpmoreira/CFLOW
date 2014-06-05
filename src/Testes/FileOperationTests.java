@@ -38,9 +38,6 @@ public class FileOperationTests {
 	     
 		
 	}
-<<<<<<< HEAD
-
-	
 	
 	@Test
 	public void testRestoreFiles(){
@@ -72,8 +69,6 @@ public class FileOperationTests {
 		
 	}
 	
-=======
->>>>>>> FETCH_HEAD
 	@Test
 	public void testMoveJarFile(){
 		
@@ -84,9 +79,6 @@ public class FileOperationTests {
 		}
 		
 	}
-<<<<<<< HEAD
 
-=======
->>>>>>> FETCH_HEAD
 
 }
