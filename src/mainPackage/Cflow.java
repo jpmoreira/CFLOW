@@ -99,7 +99,6 @@ public class Cflow {
 			restore(sourceDir, backupDir);
 			System.out.println("Restore Sucessfull.");
 			return;
-			
 		}
 		
 		try {
@@ -385,4 +384,17 @@ public class Cflow {
 	      out.write((char)c);
 	    }
 	  }
+	static boolean moveJarToSourceDir(File directoryToPlaceJar) throws IOException{
+		
+		java.net.URL jarURL=Cflow.class.getResource("automata.jar");
+		
+		File jarFile=new File(jarURL.getPath());
+		File outputFile=createDirectoryWithAbsolutePath(directoryToPlaceJar.getAbsolutePath()+"/automata.jar");
+		if(!jarFile.exists())return false;
+		copyFile(jarFile, outputFile);
+		return true;
+		
+		
+	}
+
 }
