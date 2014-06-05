@@ -30,13 +30,13 @@ public class Automaton implements Serializable{
 	private Automaton(State[] transitions) {
 
 		this.transition = transitions;
-		
+
 		currentStates = new HashSet<Integer>();
 		currentStates.add(0);
-		
+
 		lastValidStates = new ArrayList<Integer>();
 		lastValidStates.add(0);
-		
+
 		invalidInput = new ArrayList<String>();
 
 	}
@@ -61,7 +61,7 @@ public class Automaton implements Serializable{
 	public static void consume(String input){
 
 		if (automaton.currentStates.size() == 0 ) return;
-		
+
 		Set<Integer> tempCurrentStates = new HashSet<Integer>();
 		ArrayList<Integer> tempLastValidStates = new ArrayList<Integer>();
 
@@ -72,7 +72,7 @@ public class Automaton implements Serializable{
 			Integer[] stateAux = automaton.transition[currentState].nextState(input);
 
 			for (int st : stateAux) {
-				
+
 				if (st == automaton.emptyStateIndex) {
 
 					tempLastValidStates.add(currentState);
@@ -85,11 +85,11 @@ public class Automaton implements Serializable{
 					automaton.lastValidInput = input;
 
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		automaton.currentStates = tempCurrentStates;
 		automaton.lastValidStates = tempLastValidStates;
 
@@ -141,35 +141,40 @@ public class Automaton implements Serializable{
 			e.printStackTrace();
 		}
 
-		
+
 		if (automaton.currentStates.size() == 0) {
-			
+
 			System.out.println("Invalid flow at:");
-			
-			
+
+
 			for (int i = 0; i < automaton.lastValidStates.size(); i++) {
-				
+
 				System.out.println("- flow control point \"" + automaton.lastValidInput + "\" receive a input: \"" + automaton.invalidInput.get(i) +"\"");
 
-				expectedInput(automaton.lastValidStates.get(i));
-				
 			}
+
+			expectedInput(automaton.lastValidStates);
 			
+			return;
+
 		}
 
+		Set<Integer> auxCurrentStates = new HashSet<Integer>();
+		
 		for (int currentState : automaton.currentStates){
 
 			if (automaton.transition[currentState].isFinal()) {			
 				System.out.println("Program ran as expected.");
-				break;
+				return;
+			} else {
+				auxCurrentStates.add(currentState);
 			}
 
-			System.out.println("Incomplete flow.");
-			System.out.println("Program stopped at: \"" + automaton.lastValidInput + "\"");
-
-			expectedInput(currentState);
-
 		}
+
+		System.out.println("Incomplete flow.");
+		System.out.println("Program stopped at: \"" + automaton.lastValidInput + "\"");
+		expectedInput(auxCurrentStates);
 
 
 
@@ -177,11 +182,43 @@ public class Automaton implements Serializable{
 
 	}
 
-	private static void expectedInput(int lastValidState) {
+	private static void expectedInput(Set<Integer> currentStates2) {
 
-		Set<String> validInputs = automaton.transition[lastValidState].validStates().keySet();
+		Set<String> validInputs = new HashSet<String>();
 
 		System.out.println("Expected inputs:");
+
+		for(int state : currentStates2){
+			Set<String> tempValidImputs = automaton.transition[state].validStates().keySet();
+
+			for (String s : tempValidImputs){
+				validInputs.add(s);
+			}
+
+		}	
+
+		for (String s : validInputs){
+			System.out.println("\"" + s + "\"");
+		}
+
+	}
+
+
+
+	private static void expectedInput(ArrayList<Integer> lastValidStates2) {
+
+		Set<String> validInputs = new HashSet<String>();
+
+		System.out.println("Expected inputs:");
+
+		for(int state : lastValidStates2){
+			Set<String> tempValidImputs = automaton.transition[state].validStates().keySet();
+
+			for (String s : tempValidImputs){
+				validInputs.add(s);
+			}
+
+		}	
 
 		for (String s : validInputs){
 			System.out.println("\"" + s + "\"");

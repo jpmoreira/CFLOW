@@ -123,5 +123,145 @@ public class AutomatonTest {
 		System.out.println();
 
 	}
+	
+	
+	
+	@Test
+	public void transitionTest_04(){
+		
+		HashMap<String, Integer[]> tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {0,1});
+		
+		State st0 = new MyState(tempHash, false);
+		
+		
+		
+		tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {1,2});
+		tempHash.put("b", new Integer[] {2});
+
+		State st1 = new MyState(tempHash, false);
+		
+		
+		
+		tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {0,2});
+
+		State st2 = new MyState(tempHash, true);
+		
+		
+		transitionTable = new State[] {st0,st1,st2};
+		
+		Automaton.getAutomaton(transitionTable);
+		
+		
+
+		System.out.println("Teste 4");
+
+		String[] flow = {"a","a","a","a"};
+
+		for (String flowPoint: flow) {
+
+			Automaton.consume(flowPoint);
+
+		}
+		
+		Automaton.validateResult();
+		System.out.println();
+
+	}
+	
+	
+	@Test
+	public void transitionTest_05(){
+		
+		HashMap<String, Integer[]> tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {0,1});
+		
+		State st0 = new MyState(tempHash, false);
+		
+		
+		
+		tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {1,2});
+		tempHash.put("b", new Integer[] {2});
+
+		State st1 = new MyState(tempHash, false);
+		
+		
+		
+		tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {0,2});
+
+		State st2 = new MyState(tempHash, true);
+		
+		
+		transitionTable = new State[] {st0,st1,st2};
+		
+		Automaton.getAutomaton(transitionTable);
+		
+		
+
+		System.out.println("Teste 5");
+
+		String[] flow = {"a","b"};
+
+		for (String flowPoint: flow) {
+
+			Automaton.consume(flowPoint);
+
+		}
+		
+		Automaton.validateResult();
+		System.out.println();
+
+	}
+	
+	
+	
+	@Test
+	public void transitionTest_06(){
+		
+		HashMap<String, Integer[]> tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {0,1});
+		
+		State st0 = new MyState(tempHash, false);
+		
+		
+		
+		tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {1,2});
+		tempHash.put("b", new Integer[] {2});
+
+		State st1 = new MyState(tempHash, false);
+		
+		
+		
+		tempHash = new HashMap<String, Integer[]>();
+		tempHash.put("a", new Integer[] {0,2});
+
+		State st2 = new MyState(tempHash, true);
+		
+		
+		transitionTable = new State[] {st0,st1,st2};
+		
+		Automaton.getAutomaton(transitionTable);
+		
+		
+
+		System.out.println("Teste 3");
+
+		String[] flow = {"b","b"};
+
+		for (String flowPoint: flow) {
+
+			Automaton.consume(flowPoint);
+
+		}
+		
+		Automaton.validateResult();
+		System.out.println();
+
+	}
 
 }
