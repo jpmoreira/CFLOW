@@ -5,8 +5,8 @@ package REGEX;
 public
 class ASTTerminal extends SimpleNode {
 	int upperBound,lowerBound;
-	boolean isTrueTerminal;
-	String idString;
+	public boolean isTrueTerminal;
+	public String idString;
   public ASTTerminal(int id) {
     super(id);
   }
