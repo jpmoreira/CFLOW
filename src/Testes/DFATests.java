@@ -1,9 +1,11 @@
-package DFA;
+package Testes;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import DFA.AutomataState;
+import DFA.NFA;
 import REGEX.ASTCONCAT;
 import REGEX.ASTOR;
 import REGEX.ASTTerminal;

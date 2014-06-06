@@ -23,7 +23,6 @@ import DFA.Automaton;
 import REGEX.EG2;
 import REGEX.ParseException;
 import REGEX.SimpleNode;
-import Testes.NFATest;
 
 
 
