@@ -107,6 +107,16 @@ public class AutomataState {
 	}
 
 
+	private ArrayList<String> getTransitions() {
+		return this.transitions;
+	}
+
+	private ArrayList<AutomataState> getOuts() {
+		return this.outs;
+	}
+	
+	
+
 	public AutomataState deepCloneImpl(Map<AutomataState, AutomataState> copies) {
 	    AutomataState copy = copies.get(this);
 	    if (copy == null) {//if this was not copied yet
