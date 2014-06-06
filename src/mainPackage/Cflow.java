@@ -19,10 +19,12 @@ import javax.print.DocFlavor.URL;
 import javax.xml.crypto.KeySelector.Purpose;
 
 import automaton.State;
+import DFA.NFA;
 import DFA.Automaton;
 import REGEX.EG2;
 import REGEX.ParseException;
 import REGEX.SimpleNode;
+import Testes.NFATest;
 
 
 
@@ -73,19 +75,31 @@ public class Cflow {
 		 * 
 		 * */
 		
-		java.net.URL location = Cflow.class.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println(location.getFile());
+
 		SimpleNode tree;
 		
-		if(args.length<3){
+		if((args.length != 2 && args[0].equals("-restore")) ||  args.length != 7){
 			System.out.println("Invalid Usage");
 			printUsage();
 			return;
 			
 		}
+		
+		String compilerFlags=getCompilerFlags(args);
+		String executeParams=getExecuteParams(args);
+		
+		if (compilerFlags == null || executeParams == null) {
+			System.out.println("Invalid Usage");
+			printUsage();
+			return;
+		}
+		
 		String regex=args[0]+"\n";
 		
 		File sourceDir=new File(getSourceDirName(args));
+		
+		System.out.println("Working on source directory: " + sourceDir.getAbsolutePath());
+		
 		if(!sourceDir.exists() || !sourceDir.isDirectory()){
 			System.out.println("Invalid directory choosen.");
 			printUsage();
@@ -93,6 +107,8 @@ public class Cflow {
 		}
 		
 		File backupDir=createDirectoryWithAbsolutePath(sourceDir.getAbsolutePath()+"/"+tempDirectoryName);
+		
+		
 		
 		
 		if(shouldRestore(args)){
@@ -108,6 +124,15 @@ public class Cflow {
 			return;
 		}
 		
+		System.out.println("Created backup directory: " + backupDir.getAbsolutePath());
+		
+		
+		try {
+			replaceTags(sourceDir,new CodeReplacer());
+		} catch (IOException e2) {
+			System.out.println("Unable to replace tags. Execution will be aborted");
+			return;
+		}
 		
 	
 		try {
@@ -120,31 +145,50 @@ public class Cflow {
 			return;
 		}
 		
-		
-		
-		String compilerFlags=getCompilerFlags(args);
-		String executeParams=getExecuteParams(args);
+		System.out.println("Moved '.jar' file to: " + sourceDir.getAbsolutePath());
 		
 		
 		InputStream regexStream = new ByteArrayInputStream(regex.getBytes());
-		new EG2(regexStream);
+		EG2 eg = new EG2(regexStream);
 		try {
-			tree = EG2.Regex();
+			tree = eg.Regex();
 		} catch (ParseException e) {
 			System.out.println("Invalid Regex Expression passed: "+regex);
 		}
 		
 		
+		
+		compilerFlags = "-cp " + sourceDir + "/automata.jar " + compilerFlags;
+		
 		try {
 			compile(compilerFlags);
 		} catch (IOException e) {
 			System.out.println("Unable To Compile");
+			return;
 		} catch (InterruptedException e) {
 			System.out.println("Unable to compile");
+			return;
 		}
+		
+		System.out.println("Successfull compilation with flags " + compilerFlags);
 		
 		//removeTempDirAndContent();
 
+	}
+
+	private static void replaceTags(File sourceDir, CodeReplacer c) throws IOException {
+		
+		
+		for (File child: sourceDir.listFiles()){
+			
+			if (child.isDirectory()) 
+				replaceTags(child,c);
+			else if (child.isFile() && child.getName().matches(".*\\.java"))
+				c.replaceCflowTags(child.getAbsolutePath(), child.getAbsolutePath());
+			
+		}
+		
+		
 	}
 
 	public static void restore(File sourceDir,File backupDir){
@@ -217,7 +261,7 @@ public class Cflow {
 		
 		for(int i=0;i<args.length-1;i++){
 			
-			if(args[i]=="-dir"){
+			if(args[i].equals("-dir")){
 				return args[i+1];
 			}
 		}
@@ -269,10 +313,6 @@ public class Cflow {
 		
 		System.out.println("USAGE:");
 		System.out.println("	CFLOW -restore <source directory>");
-		System.out.println("	CFLOW \"<REGEX>\"");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory>");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\"");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -execute \"<execution parameters>\" ");
 		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" ");
 	}
 	
@@ -338,7 +378,7 @@ public class Cflow {
 		
 		
 		Runtime rt = Runtime.getRuntime();
-		Process proc = rt.exec("javac"+compilerFlags);//TODO not passing jar file 
+		Process proc = rt.exec("javac "+compilerFlags);//TODO not passing jar file 
 		//output both stdout and stderr data from proc to stdout of this process
 		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
 		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());

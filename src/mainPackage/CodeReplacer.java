@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import AnnotationGrammar.ASTCflow;
 
@@ -18,7 +20,7 @@ public class CodeReplacer {
 	
 	private final String callStart="Automaton.consume(\"";
 	private final String callEnd="\");\n";
-	private final String importStatement="import Automaton;\n";
+	private final String importStatement="\nimport automaton.Automaton;\n";
 	
 	private int lineNumber=1;
 	
@@ -34,15 +36,25 @@ public class CodeReplacer {
 		lineNumber=1;
 		BufferedReader reader=new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
 		
-		String input=importStatement;
+		String input = "";
 		int readChar;
 		char c;
+		boolean placedImport=false;
 		
 
 		readChar= reader.read();
 		while(readChar!=-1){
 			
 			c=(char)readChar;
+			if (!placedImport){
+				
+				Pattern p = Pattern.compile(".*package.*;",Pattern.DOTALL);
+				Matcher m = p.matcher(input);
+				if(m.matches()){
+					input+=importStatement;
+					placedImport=true;
+				}
+			}
 			if(c=='\n')lineNumber++;
 			if(c=='@'){
 				input+=attemptReplacement(reader);
@@ -52,13 +64,14 @@ public class CodeReplacer {
 			readChar=reader.read();
 			
 		}
-	
+
+		reader.close();
 	
 		
 		
 		File file = new File(outputFile);  
-		FileWriter writer = new FileWriter(file, true);  
-		writer.write(input);
+		PrintWriter writer = new PrintWriter(file);  
+		writer.print(input);
 		writer.close();
 		
 		
