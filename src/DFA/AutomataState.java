@@ -1,6 +1,8 @@
 package DFA;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AutomataState {
 	
@@ -47,6 +49,21 @@ public class AutomataState {
 	}
 	
 
+	public AutomataState deepCloneImpl(Map<AutomataState, AutomataState> copies) {
+	    AutomataState copy = copies.get(this);
+	    if (copy == null) {//if this was not copied yet
+	      copy = new AutomataState(this.isFinal,this.isInitial);
+	      copy.transitions=this.transitions;
+	      // Map the new AutomataState _before_ copying children.
+	      copies.put(this, copy);
+	      for (AutomataState child : this.outs)
+	        copy.outs.add(child.deepCloneImpl(copies));//add a deep clone copy of the original graph
+	    }
+	    return copy;
+	  }
 
+	  public AutomataState deepClone() {
+	    return deepCloneImpl(new HashMap<AutomataState, AutomataState>());
+	  }
 
 }
