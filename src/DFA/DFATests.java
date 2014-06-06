@@ -66,7 +66,7 @@ public class DFATests {
 		a.printTable();
 		AutomataState s=a.getStart();
 		
-		AutomataState[] startClosure = s.closure();
+		AutomataState[] startClosure = s.closure().;
 		
 		for (AutomataState q : startClosure){
 			System.out.println("State: " + q.id);

@@ -7,7 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import automaton.Automaton;
+import DFA.Automaton;
 import automaton.State;
 
 public class AutomatonTest {

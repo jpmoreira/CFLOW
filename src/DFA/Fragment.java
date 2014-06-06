@@ -37,11 +37,19 @@ public class Fragment{
 			return orFragment((ASTOR)s, stack);
 		}
 		else if(s instanceof ASTTerminal){
-			if(((ASTTerminal)s).isTrueTerminal){
+			ASTTerminal t=(ASTTerminal)s;
+			if(t.isTrueTerminal){
 				return terminalFragment((ASTTerminal)s);
 			}
+			else if(t.lowerBound==0 && t.upperBound==Integer.MAX_VALUE) {
+				return applyKleeneStartToFragment(stack.pop());
+			}
+			else if(t.lowerBound==1 && t.upperBound==Integer.MAX_VALUE){
+				return applyPlusToFragment(stack.pop());
+			}
+			else if(t.upperBound==1 && t.lowerBound==1)return null;
 			else{
-				
+				return applyRepetitionTo(stack.pop(), t.lowerBound, t.upperBound);
 			}
 		}
 		
@@ -90,8 +98,8 @@ public class Fragment{
 	
 	static Fragment terminalFragment(ASTTerminal s){
 		
-		AutomataState start=new AutomataState(true, false);
-		AutomataState end=new AutomataState(false, true);
+		AutomataState start=new AutomataState(false, true);
+		AutomataState end=new AutomataState(true, false);
 		start.addTransition(s.idString, end);
 		Fragment f=new Fragment(start, end);
 		
@@ -143,6 +151,10 @@ public class Fragment{
 	//create new end and start nodes	
 	AutomataState start=new AutomataState(false, true);
 	AutomataState end=new AutomataState(true,false);
+	f.start.setFinal(false);
+	f.start.setInitial(false);
+	f.exit.setFinal(false);
+	f.start.setFinal(false);
 	
 	Fragment fragSequence[]=new Fragment[max];//create an array to hold all the fragments
 

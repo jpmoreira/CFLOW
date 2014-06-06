@@ -14,10 +14,10 @@ public class NFA {
 	
 	private Stack<Fragment> workingStack=new Stack<Fragment>();
 	
-	private AutomataState start;
+	public AutomataState start;
 	
 	
-	NFA(SimpleNode tree){
+	public NFA(SimpleNode tree){
 		
 		composeNFA(tree);
 		
@@ -25,7 +25,7 @@ public class NFA {
 		
 	}
 	
-	NFA(AutomataState state){
+	public NFA(AutomataState state){
 		start=state;
 	}
 	
@@ -41,6 +41,7 @@ public class NFA {
 				composeNFA(child);
 			}
 			Fragment frag=Fragment.fragmentForNode(tree,workingStack);
+			if(frag==null)return;
 			workingStack.push(frag);
 			
 	}
@@ -84,7 +85,7 @@ public class NFA {
 	}
 	
 	
-	void printTable(){
+	public void printTable(){
 		HashMap<Integer, HashMap<String,ArrayList<Integer>> > table=this.transitionTable();
 		
 		
@@ -112,36 +113,70 @@ public class NFA {
 	}
 
 
+	HashMap<Integer, HashMap<String,Integer>> simplified_dfa_table(){
+		
+		HashMap<Integer, HashMap<String,Integer>> simplifiedTable=new HashMap<Integer, HashMap<String,Integer>>();
+		
+		HashMap<Closure , HashMap<String,Closure> > normalTable=this.dfa_table();
+		
+		Set<Closure> keyLines=normalTable.keySet();
+		
+		for (Closure closure : keyLines) {
+			
+			HashMap<String,Closure> normalLine=normalTable.get(closure);
+			HashMap<String,Integer> simplifiedLine=new HashMap<String, Integer>();
+			
+			Set<String> lineKeys=normalLine.keySet();
+			for (String string : lineKeys) {
+				simplifiedLine.put(string, normalLine.get(string).getID());//place a similar element but with the id
+			}
+			simplifiedTable.put(closure.getID(), simplifiedLine);
+			
+			
+		}
+		
+		return simplifiedTable;
+		
+	}
 	
-	HashMap<HashSet<AutomataState> , HashMap<String,HashSet<AutomataState>> > dfa_table(){
+	HashMap<Closure , HashMap<String,Closure> > dfa_table(){
 		
 		
-		HashMap<HashSet<AutomataState> , HashMap<String,HashSet<AutomataState>> > table= new HashMap<HashSet<AutomataState>, HashMap<String,HashSet<AutomataState>>>();
+		HashMap<Closure , HashMap<String,Closure> > table= new HashMap<Closure, HashMap<String,Closure>>();
 		
-		HashSet<AutomataState> firstStateClosure=this.start.closure();
-		ArrayList<HashSet<AutomataState>> closuresToProcess=new ArrayList<HashSet<AutomataState>>();//will save the closures not yet processed
+		Closure firstStateClosure=this.start.closure();
+		ArrayList<Closure> closuresToProcess=new ArrayList<Closure>();//will save the closures not yet processed
 		closuresToProcess.add(firstStateClosure);
 		
 		while(closuresToProcess.size()>0){//while we have closures to process
 		
 			//get last closure to process and delete it (aka pop)
-			HashSet<AutomataState> processingClosure=closuresToProcess.get(closuresToProcess.size()-1);
+			Closure processingClosure=closuresToProcess.get(closuresToProcess.size()-1);
 			closuresToProcess.remove(processingClosure);
 			
-			HashMap<String,HashSet<AutomataState>> tableLine=this.dfa_lineForClosure(processingClosure);
+			System.out.print("Closure "+processingClosure.toString()+" "+processingClosure.getID()+" with Transitions: ");
+			
+			HashMap<String,Closure> tableLine=this.dfa_lineForClosure(processingClosure);
+			
+			table.put(processingClosure, tableLine);//place line in the table
 			
 			Set<String> allTransitions=tableLine.keySet();
 			
 			
 			for (String transition : allTransitions) {
 				
-				HashSet<AutomataState> closure=tableLine.get(transition);
 				
-				if(table.get(closure)==null)table.put(closure, tableLine);
-				else closuresToProcess.add(closure);
+				
+				Closure closure=tableLine.get(transition);
+				System.out.print(transition+"->"+closure.toString()+" "+closure.getID());
+				
+				if(table.get(closure)==null)closuresToProcess.add(closure);
+				
 				
 				
 			}
+			
+			System.out.println("");
 			
 		}
 		
@@ -150,47 +185,67 @@ public class NFA {
 	}
 	
 	
-	HashMap<String,HashSet<AutomataState>> dfa_lineForClosure(HashSet<AutomataState> groupOfStates){
+	HashMap<String,Closure> dfa_lineForClosure(Closure groupOfStates){
 	
+		
+		HashMap<String, Closure> tableLineToReturn =new HashMap<String, Closure>();
+		
 		HashMap<String, HashSet<AutomataState>> tableLine =new HashMap<String, HashSet<AutomataState>>();
 		
-		AutomataState[] statesArray=new AutomataState[groupOfStates.size()];
 		
-		groupOfStates.toArray(statesArray);
-		for (AutomataState state : statesArray) {//for each state in the closure
+		
+		for (AutomataState state : groupOfStates.getStates()) {//for each state in the closure
+			
 			ArrayList<AutomataState> destStates=state.outs;
 			ArrayList<String> transitions=state.transitions;
 			
 			for(int i=0; i<destStates.size();i++){//for each of the transitions
 				if(transitions.get(i)==null)continue;//ignore epsilon transitions
 				HashSet<AutomataState>closure=tableLine.get(transitions.get(i));
+				
 				if(closure==null){//if no closure is there already
 					closure=new HashSet<AutomataState>();
 					tableLine.put(transitions.get(i), closure);//put the current closure there for this transition
 				}
-				closure.add(destStates.get(i));//put the curent transition states in the closure
+				
+				Closure destenyStateClosure=destStates.get(i).closure();//get the closure of the destination
+				for (AutomataState automataState : destenyStateClosure.states) {
+					closure.add(automataState);
+				}
 			}
 			
 		}
 		
-		return tableLine;
+		Set<String> keys=tableLine.keySet();
+		
+		for (String string : keys) {
+			
+			tableLineToReturn.put(string, Closure.getClosureWithStates(tableLine.get(string)));
+			
+		}
+		
+		return tableLineToReturn;
 	}
 
-	private static boolean isIdenticalHashSet (HashSet<AutomataState> h1, HashSet<AutomataState> h2) {
-	    if ( h1.size() != h2.size() ) {
-	        return false;
-	    }
-	    HashSet<AutomataState> clone = new HashSet<AutomataState>(h2); // just use h2 if you don't need to save the original h2
-	    
-	    Iterator<AutomataState> it = h1.iterator();
-	    while (it.hasNext() ){
-	        AutomataState state= it.next();
-	        if (clone.contains(state)){ // replace clone with h2 if not concerned with saving data from h2
-	            clone.remove(state);
-	        } else {
-	            return false;
-	        }
-	    }
-	    return true; // will only return true if sets are equal
+	
+	public void printDFATable(){
+		
+		HashMap<Closure , HashMap<String,Closure> > table=this.dfa_table();
+		
+		Set<Closure> closures=table.keySet();
+		
+		for (Closure closure : closures) {
+			
+			System.out.print(""+closure.getID()+": ");
+			
+			Set<String> strings=table.get(closure).keySet();
+			for (String string : strings) {
+				System.out.print(string+"->"+table.get(closure).get(string).getID()+"  ");
+			}
+			
+			System.out.println("");
+		}
+		
 	}
+
 }
