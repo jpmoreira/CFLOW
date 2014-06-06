@@ -18,8 +18,8 @@ import java.util.Iterator;
 import javax.print.DocFlavor.URL;
 import javax.xml.crypto.KeySelector.Purpose;
 
-import automaton.Automaton;
 import automaton.State;
+import DFA.Automaton;
 import REGEX.EG2;
 import REGEX.ParseException;
 import REGEX.SimpleNode;

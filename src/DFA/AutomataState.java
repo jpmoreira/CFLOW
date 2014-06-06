@@ -55,47 +55,38 @@ public class AutomataState {
 		transitions.add(symbol);
 	}
 	
-	public HashSet<AutomataState> closure(){
+	public Closure closure(){
 		
 		HashSet<AutomataState> closureStates = new HashSet<AutomataState>();		
-		HashSet<AutomataState> visitedStates = new HashSet<AutomataState>();
+		ArrayList<AutomataState> visitedStates =new ArrayList<AutomataState>();
 		
 		closureStates.add(this);
-		visitedStates.add(this);
+		AutomataState visitingState=this;
 		
-		for (int i = 0; i < transitions.size(); i++) {
+		
+		while (visitingState!=null) {
+			visitedStates.add(visitingState);
 			
-			if (transitions.get(i) == null) {
-				closureStates.add(outs.get(i));
-			}
+			for(int i=0;i<visitingState.transitions.size();i++){
+				if(visitingState.transitions.get(i)!=null)continue;//escape non epsilon transitions
+				closureStates.add(visitingState.outs.get(i));//add state to closure
 				
-		}
-		
-		Object[] auxClosureStates = closureStates.toArray();
-		int it = 0;
-		
-		while (closureStates.size() != visitedStates.size()) {
-			
-			it++;
-			AutomataState aux = (AutomataState) auxClosureStates[it];
-			visitedStates.add(aux);
-			
-			ArrayList<AutomataState> tempOuts = aux.getOuts();
-			ArrayList<String> tempTransitions = aux.getTransitions();
-			
-			for (int i = 0; i < tempTransitions.size(); i++) {
-				
-				if (tempTransitions.get(i) == null) {
-					closureStates.add(tempOuts.get(i));
-				}		
 			}
 			
-			auxClosureStates = closureStates.toArray();
+			visitingState=null;//set to null
+			for(AutomataState candidateState: closureStates){//try to get a new state to visit
+				if(!visitedStates.contains(candidateState)){
+					visitingState=candidateState;
+					break;
+				}
+				
+			}
+			
 			
 		}
 		
 		
-		return closureStates;
+		return Closure.getClosureWithStates(closureStates);
 	}
 
 
@@ -113,11 +104,13 @@ public class AutomataState {
 	    AutomataState copy = copies.get(this);
 	    if (copy == null) {//if this was not copied yet
 	      copy = new AutomataState(this.isFinal,this.isInitial);
-	      copy.transitions=this.transitions;
+	      //copy.transitions=this.transitions;
 	      // Map the new AutomataState _before_ copying children.
 	      copies.put(this, copy);
-	      for (AutomataState child : this.outs)
-	        copy.outs.add(child.deepCloneImpl(copies));//add a deep clone copy of the original graph
+	      for(int i=0;i<this.outs.size();i++){
+	    	  copy.addTransition(this.transitions.get(i), this.outs.get(i).deepCloneImpl(copies));
+	      }
+	      	
 	    }
 	    return copy;
 	  }
