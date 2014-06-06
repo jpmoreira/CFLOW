@@ -54,7 +54,6 @@ public class AutomataState {
 		transitions.add(symbol);
 	}
 	
-<<<<<<< HEAD
 	public AutomataState[] closure(){
 		
 		Set<AutomataState> closureStates = new HashSet<AutomataState>();		
@@ -106,8 +105,7 @@ public class AutomataState {
 		
 		return result;
 	}
-=======
->>>>>>> FETCH_HEAD
+
 
 	public AutomataState deepCloneImpl(Map<AutomataState, AutomataState> copies) {
 	    AutomataState copy = copies.get(this);
