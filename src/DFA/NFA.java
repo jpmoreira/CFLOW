@@ -154,7 +154,7 @@ public class NFA {
 			Closure processingClosure=closuresToProcess.get(closuresToProcess.size()-1);
 			closuresToProcess.remove(processingClosure);
 			
-			System.out.print("Closure "+processingClosure.toString()+" "+processingClosure.getID()+" with Transitions: ");
+			//System.out.print("Closure "+processingClosure.toString()+" "+processingClosure.getID()+" with Transitions: ");
 			
 			HashMap<String,Closure> tableLine=this.dfa_lineForClosure(processingClosure);
 			
@@ -168,7 +168,7 @@ public class NFA {
 				
 				
 				Closure closure=tableLine.get(transition);
-				System.out.print(transition+"->"+closure.toString()+" "+closure.getID());
+				//System.out.print(transition+"->"+closure.toString()+" "+closure.getID());
 				
 				if(table.get(closure)==null)closuresToProcess.add(closure);
 				

@@ -22,7 +22,7 @@ public class Automaton implements Serializable{
 
 	private String invalidInput;
 
-	private String lastValidInput = "first input";
+	private String lastValidInput = "";
 	
 	private Integer[] finalStates;
 
@@ -34,6 +34,7 @@ public class Automaton implements Serializable{
 		currentState =Closure.initialClosure(); 
 
 		lastValidState = currentState;
+		this.finalStates=Closure.finalClosures();
 
 		invalidInput = "";
 
@@ -158,7 +159,7 @@ public class Automaton implements Serializable{
 
 
 		System.out.println("Incomplete flow.");
-		System.out.println("Program stopped at: \"" + automaton.lastValidInput + "\"");
+		System.out.println("Program stopped working accordingly at: \"" + automaton.lastValidInput + "\"");
 		printExpectedInput(automaton.lastValidState);
 
 
