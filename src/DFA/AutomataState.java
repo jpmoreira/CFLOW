@@ -102,6 +102,10 @@ public class AutomataState {
 			result[i] = (AutomataState) auxClosureStates[i];
 		}
 		
+		
+		
+		
+		
 		return result;
 	}
 
