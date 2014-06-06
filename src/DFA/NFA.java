@@ -25,6 +25,9 @@ public class NFA {
 		
 	}
 	
+	NFA(AutomataState state){
+		start=state;
+	}
 	
 	public AutomataState getStart() {
 		return start;
