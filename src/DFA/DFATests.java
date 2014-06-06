@@ -45,34 +45,6 @@ public class DFATests {
 		a.printTable();
 	}
 	
-	@Test
-	public void test2() {
-		
-		System.out.println("CONCAT:");
-		ASTCONCAT concatNode=new ASTCONCAT(27);
-		ASTTerminal terminal1=new ASTTerminal(28);
-		terminal1.isTrueTerminal=true;
-		terminal1.idString="a";
-		ASTTerminal terminal2=new ASTTerminal(28);
-		terminal2.isTrueTerminal=true;
-		terminal2.idString="a";
-		
-		
-		concatNode.jjtAddChild(terminal1, 0);
-		concatNode.jjtAddChild(terminal2, 1);
-		
-		NFA a=new NFA(concatNode);
-		
-		a.printTable();
-		AutomataState s=a.getStart();
-		
-		AutomataState[] startClosure = s.closure().;
-		
-		for (AutomataState q : startClosure){
-			System.out.println("State: " + q.id);
-		}
-		
-	}
 	
 	@Test
 	public void test3() {
