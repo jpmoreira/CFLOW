@@ -6,94 +6,116 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Automaton implements Serializable{
 
 	private static Automaton automaton = null;
 
-	private static State[] transition;
+	private State[] transition;
 
-	private static int emptyStateIndex = -1;
+	private int emptyStateIndex = -1;
 
-	private static int currentState;
-	
-	private static int lastValidState = 0;
-	
-	private static String invalidInput;
-	
-	private static String lastValidInput;
+	private Set<Integer> currentStates;
 
-	
-	private Automaton() {
+	private ArrayList<Integer> lastValidStates;
 
-		
+	private ArrayList<String> invalidInput;
+
+	private String lastValidInput = "first input";
+
+
+	private Automaton(State[] transitions) {
+
+		this.transition = transitions;
+
+		currentStates = new HashSet<Integer>();
+		currentStates.add(0);
+
+		lastValidStates = new ArrayList<Integer>();
+		lastValidStates.add(0);
+
+		invalidInput = new ArrayList<String>();
+
 	}
-	
-	public static void initializeAutomaton(State[] transitions){
-
-		Automaton.transition = transitions;
-		
-	}
 
 
-	public static Automaton getAutomaton() {
-		
-		if(automaton == null){
 
-			automaton = new Automaton();
+	public static Automaton getAutomaton(State[] transitions) {
+
+		if(transitions != null){
+
+			automaton = new Automaton(transitions);
 			return automaton;
-			
+
 		}
 		else
 			return automaton;
-		
+
 
 	}
 
 
-	public void consume(String input){
+	public static void consume(String input){
 
-		if (currentState == emptyStateIndex) return;
-		
-		int tempState = currentState;
+		if (automaton.currentStates.size() == 0 ) return;
 
-		currentState = transition[currentState].nextState(input);
+		Set<Integer> tempCurrentStates = new HashSet<Integer>();
+		ArrayList<Integer> tempLastValidStates = new ArrayList<Integer>();
 
-		if (currentState == emptyStateIndex){
-			
-			lastValidState = tempState;
-			invalidInput = input;
-			
-		} else {
-			
-			lastValidInput = input;
-			
+
+		for (int currentState : automaton.currentStates){
+
+
+			Integer[] stateAux = automaton.transition[currentState].nextState(input);
+
+			for (int st : stateAux) {
+
+				if (st == automaton.emptyStateIndex) {
+
+					tempLastValidStates.add(currentState);
+					automaton.invalidInput.add(input);
+
+				} else {
+
+					tempLastValidStates.add(currentState);
+					tempCurrentStates.add(st);
+					automaton.lastValidInput = input;
+
+				}
+
+			}
+
 		}
-		
+
+		automaton.currentStates = tempCurrentStates;
+		automaton.lastValidStates = tempLastValidStates;
+
 		try {
 			saveFlow();
 		} catch (IOException i){
 			System.out.println("Error saving automaton.");
-			
+			i.printStackTrace();
 		}
 
 	}
 
-	
-	private void saveFlow() throws IOException {
-		
+
+	private static void saveFlow() throws IOException {
+
 		FileOutputStream fileOut = new FileOutputStream("./automaton");
 		ObjectOutputStream os = new ObjectOutputStream(fileOut);
 
-		/* Write the game in a file */
-		os.writeObject(this);
+		/* Write the automaton in a file */
+		os.writeObject(automaton);
 
 		fileOut.close();
 		os.close();	
-		
+
 	}
-	
+
 	private static void loadFlow() throws IOException, ClassNotFoundException  {
 
 		FileInputStream fileIn = new FileInputStream("./automaton");
@@ -108,7 +130,7 @@ public class Automaton implements Serializable{
 	}
 
 	public static void validateResult(){
-		
+
 		try {
 			loadFlow();
 		} catch (IOException e) {
@@ -118,43 +140,94 @@ public class Automaton implements Serializable{
 			System.out.println("Error loading automaton.");
 			e.printStackTrace();
 		}
-		
-		if (currentState == emptyStateIndex) {
-			
-			System.out.println("Invalid flow at flow control point: ");
-			System.out.println("Error ocurred in flow control point: " + lastValidInput);
-			System.out.println("Invalid flow control point: " + invalidInput);
-			
-			expectedInput(lastValidState);
+
+
+		if (automaton.currentStates.size() == 0) {
+
+			System.out.println("Invalid flow at:");
+
+
+			for (int i = 0; i < automaton.lastValidStates.size(); i++) {
+
+				System.out.println("- flow control point \"" + automaton.lastValidInput + "\" receive a input: \"" + automaton.invalidInput.get(i) +"\"");
+
+			}
+
+			expectedInput(automaton.lastValidStates);
 			
 			return;
-			
+
 		}
+
+		Set<Integer> auxCurrentStates = new HashSet<Integer>();
 		
-		if (transition[currentState].isFinal()) {			
-			System.out.println("Program ran as expected.");
-			return;
+		for (int currentState : automaton.currentStates){
+
+			if (automaton.transition[currentState].isFinal()) {			
+				System.out.println("Program ran as expected.");
+				return;
+			} else {
+				auxCurrentStates.add(currentState);
+			}
+
 		}
-		
+
 		System.out.println("Incomplete flow.");
-		System.out.println("Program stopped at: " + lastValidInput);
-		
-		expectedInput(lastValidState);
-		
-		
+		System.out.println("Program stopped at: \"" + automaton.lastValidInput + "\"");
+		expectedInput(auxCurrentStates);
+
+
+
 		return;
-		
+
 	}
 
-	private static void expectedInput(int lastValidState2) {
-		
-		Set<String> validInputs = transition[lastValidState2].validStates().keySet();
-		
+	private static void expectedInput(Set<Integer> currentStates2) {
+
+		Set<String> validInputs = new HashSet<String>();
+
 		System.out.println("Expected inputs:");
-		
+
+		for(int state : currentStates2){
+			Set<String> tempValidImputs = automaton.transition[state].validStates().keySet();
+
+			for (String s : tempValidImputs){
+				validInputs.add(s);
+			}
+
+		}	
+
 		for (String s : validInputs){
-			System.out.println(s);
+			System.out.println("\"" + s + "\"");
 		}
-		
+
+	}
+
+
+
+	private static void expectedInput(ArrayList<Integer> lastValidStates2) {
+
+		Set<String> validInputs = new HashSet<String>();
+
+		System.out.println("Expected inputs:");
+
+		for(int state : lastValidStates2){
+			Set<String> tempValidImputs = automaton.transition[state].validStates().keySet();
+
+			for (String s : tempValidImputs){
+				validInputs.add(s);
+			}
+
+		}	
+
+		for (String s : validInputs){
+			System.out.println("\"" + s + "\"");
+		}
+
+	}
+
+	public static void resetAutomaton() {
+		automaton = null;
+
 	}
 }

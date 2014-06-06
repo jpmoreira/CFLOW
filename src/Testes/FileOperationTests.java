@@ -38,6 +38,37 @@ public class FileOperationTests {
 	     
 		
 	}
+	
+	@Test
+	public void testRestoreFiles(){
+		
+	
+		File source=new File("/Users/vmineiro/Desktop/original");
+		File backUp=new File("/Users/vmineiro/Desktop/original/_cflow_tmp/");
+		File restore=new File("/Users/vmineiro/Desktop/original/_cflow_tmp/original");
+		
+		try {
+			Cflow.backupSourceCodeDir(source,backUp);
+		} catch (IOException e) {
+			fail("error");
+		}
+		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+			fail("error");
+		}
+		
+		try {
+			Cflow.restoreFiles(source, restore);
+		} catch (IOException e) {
+			fail("error");
+		}
+		
+		
+		
+	}
+	
 	@Test
 	public void testMoveJarFile(){
 		
@@ -48,5 +79,6 @@ public class FileOperationTests {
 		}
 		
 	}
+
 
 }

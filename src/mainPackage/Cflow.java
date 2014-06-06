@@ -187,7 +187,7 @@ public class Cflow {
 	
 	public static void restoreFiles(File operationItem,File backupItem) throws IOException{
 		
-		if(operationItem.isFile() && operationItem.isFile() && operationItem.getName().equals(backupItem)){
+		if(operationItem.isFile() && backupItem.isFile() && operationItem.getName().equals(backupItem.getName())){
 			
 			copyFile(backupItem, operationItem);
 		}

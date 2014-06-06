@@ -5,17 +5,17 @@ import java.util.Vector;
 
 public class AutomataState implements State{
 
-	public HashMap<String, Integer> States;
+	public HashMap<String, Integer[]> States;
 	
 	public Boolean isFinal;
 	
-	public AutomataState(HashMap<String, Integer> NextStates, Boolean isFinal){
+	public AutomataState(HashMap<String, Integer[]> NextStates, Boolean isFinal){
 		this.States = NextStates;
 		this.isFinal = isFinal;
 	}
 
 	@Override
-	public HashMap<String, Integer> validStates() {
+	public HashMap<String, Integer[]> validStates() {
 		return States;
 	}
 
@@ -25,7 +25,7 @@ public class AutomataState implements State{
 	}
 
 	@Override
-	public int nextState(String input) {
+	public Integer[] nextState(String input) {
 		return States.get(input);
 		
 	}

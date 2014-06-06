@@ -9,8 +9,6 @@ import REGEX.ASTOR;
 import REGEX.ASTTerminal;
 
 public class DFATests {
-
-	
 	@Test
 	public void test0() {
 		ASTTerminal terminal1=new ASTTerminal(28);
@@ -28,6 +26,7 @@ public class DFATests {
 		System.out.println("OUT");
 		AutomataState s=a.getStart();
 	}
+
 	@Test
 	public void test1() {
 		ASTOR orNode=new ASTOR(27);
@@ -66,6 +65,13 @@ public class DFATests {
 		
 		a.printTable();
 		AutomataState s=a.getStart();
+		
+		AutomataState[] startClosure = s.closure();
+		
+		for (AutomataState q : startClosure){
+			System.out.println("State: " + q.id);
+		}
+		
 	}
 	
 	@Test
@@ -141,5 +147,7 @@ public class DFATests {
 	
 	
 	
-
+	
+	
+	
 }
