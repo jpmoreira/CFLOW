@@ -2,6 +2,8 @@ package DFA;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 
@@ -104,5 +106,88 @@ public class NFA {
 			
 		}
 		
+	}
+
+
+	
+	HashMap<HashSet<AutomataState> , HashMap<String,HashSet<AutomataState>> > dfa_table(){
+		
+		
+		HashMap<HashSet<AutomataState> , HashMap<String,HashSet<AutomataState>> > table= new HashMap<HashSet<AutomataState>, HashMap<String,HashSet<AutomataState>>>();
+		
+		HashSet<AutomataState> firstStateClosure=this.start.closure();
+		ArrayList<HashSet<AutomataState>> closuresToProcess=new ArrayList<HashSet<AutomataState>>();//will save the closures not yet processed
+		closuresToProcess.add(firstStateClosure);
+		
+		while(closuresToProcess.size()>0){//while we have closures to process
+		
+			//get last closure to process and delete it (aka pop)
+			HashSet<AutomataState> processingClosure=closuresToProcess.get(closuresToProcess.size()-1);
+			closuresToProcess.remove(processingClosure);
+			
+			HashMap<String,HashSet<AutomataState>> tableLine=this.dfa_lineForClosure(processingClosure);
+			
+			Set<String> allTransitions=tableLine.keySet();
+			
+			
+			for (String transition : allTransitions) {
+				
+				HashSet<AutomataState> closure=tableLine.get(transition);
+				
+				if(table.get(closure)==null)table.put(closure, tableLine);
+				else closuresToProcess.add(closure);
+				
+				
+			}
+			
+		}
+		
+		return table;
+		
+	}
+	
+	
+	HashMap<String,HashSet<AutomataState>> dfa_lineForClosure(HashSet<AutomataState> groupOfStates){
+	
+		HashMap<String, HashSet<AutomataState>> tableLine =new HashMap<String, HashSet<AutomataState>>();
+		
+		AutomataState[] statesArray=new AutomataState[groupOfStates.size()];
+		
+		groupOfStates.toArray(statesArray);
+		for (AutomataState state : statesArray) {//for each state in the closure
+			ArrayList<AutomataState> destStates=state.outs;
+			ArrayList<String> transitions=state.transitions;
+			
+			for(int i=0; i<destStates.size();i++){//for each of the transitions
+				if(transitions.get(i)==null)continue;//ignore epsilon transitions
+				HashSet<AutomataState>closure=tableLine.get(transitions.get(i));
+				if(closure==null){//if no closure is there already
+					closure=new HashSet<AutomataState>();
+					tableLine.put(transitions.get(i), closure);//put the current closure there for this transition
+				}
+				closure.add(destStates.get(i));//put the curent transition states in the closure
+			}
+			
+		}
+		
+		return tableLine;
+	}
+
+	private static boolean isIdenticalHashSet (HashSet<AutomataState> h1, HashSet<AutomataState> h2) {
+	    if ( h1.size() != h2.size() ) {
+	        return false;
+	    }
+	    HashSet<AutomataState> clone = new HashSet<AutomataState>(h2); // just use h2 if you don't need to save the original h2
+	    
+	    Iterator<AutomataState> it = h1.iterator();
+	    while (it.hasNext() ){
+	        AutomataState state= it.next();
+	        if (clone.contains(state)){ // replace clone with h2 if not concerned with saving data from h2
+	            clone.remove(state);
+	        } else {
+	            return false;
+	        }
+	    }
+	    return true; // will only return true if sets are equal
 	}
 }

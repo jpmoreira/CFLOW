@@ -15,7 +15,7 @@ public class AutomataState {
 	
 	static int currentID=0;
 	ArrayList<AutomataState> outs=new ArrayList<AutomataState>();
-	
+	static HashMap<Integer,AutomataState> allStates=new HashMap<Integer, AutomataState>();
 	ArrayList<String> transitions=new ArrayList<String>();
 	boolean isFinal=false;
 	boolean isInitial=false;
@@ -25,6 +25,7 @@ public class AutomataState {
 		this.isFinal=isFinal;
 		this.isInitial=isInitial;
 		this.id=currentID++;
+		allStates.put(new Integer(this.id), this);
 	}
 
 	public int getId() {
@@ -54,10 +55,10 @@ public class AutomataState {
 		transitions.add(symbol);
 	}
 	
-	public AutomataState[] closure(){
+	public HashSet<AutomataState> closure(){
 		
-		Set<AutomataState> closureStates = new HashSet<AutomataState>();		
-		Set<AutomataState> visitedStates = new HashSet<AutomataState>();
+		HashSet<AutomataState> closureStates = new HashSet<AutomataState>();		
+		HashSet<AutomataState> visitedStates = new HashSet<AutomataState>();
 		
 		closureStates.add(this);
 		visitedStates.add(this);
@@ -93,17 +94,8 @@ public class AutomataState {
 			
 		}
 		
-		AutomataState[] result = new AutomataState[auxClosureStates.length]; 
 		
-		for (int i = 0 ; i < auxClosureStates.length;i++){
-			result[i] = (AutomataState) auxClosureStates[i];
-		}
-		
-		
-		
-		
-		
-		return result;
+		return closureStates;
 	}
 
 
@@ -130,8 +122,18 @@ public class AutomataState {
 	    return copy;
 	  }
 
-	  public AutomataState deepClone() {
+	public AutomataState deepClone() {
 	    return deepCloneImpl(new HashMap<AutomataState, AutomataState>());
 	  }
 
+	public static void resetStates(){
+		
+		allStates.clear();
+		currentID=0;
+	}
+	
+	public static HashMap<Integer, AutomataState> getAllStates(){
+		
+		return AutomataState.allStates;
+	}
 }
