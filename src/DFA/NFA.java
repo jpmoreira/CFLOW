@@ -113,7 +113,7 @@ public class NFA {
 	}
 
 
-	HashMap<Integer, HashMap<String,Integer>> simplified_dfa_table(){
+	public HashMap<Integer, HashMap<String,Integer>> simplified_dfa_table(){
 		
 		HashMap<Integer, HashMap<String,Integer>> simplifiedTable=new HashMap<Integer, HashMap<String,Integer>>();
 		
