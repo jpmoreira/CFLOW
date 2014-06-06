@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class AutomataState {
 	
 	
 	static int currentID=0;
 	ArrayList<AutomataState> outs=new ArrayList<AutomataState>();
-
+	
 	ArrayList<String> transitions=new ArrayList<String>();
 	boolean isFinal=false;
 	boolean isInitial=false;
@@ -43,20 +48,13 @@ public class AutomataState {
 	}
 	
 	
-	public ArrayList<AutomataState> getOuts() {
-		return outs;
-	}
-
-	public ArrayList<String> getTransitions() {
-		return transitions;
-	}
-	
 	public void addTransition(String symbol, AutomataState state){
 		
 		outs.add(state);
 		transitions.add(symbol);
 	}
 	
+<<<<<<< HEAD
 	public AutomataState[] closure(){
 		
 		Set<AutomataState> closureStates = new HashSet<AutomataState>();		
@@ -108,7 +106,24 @@ public class AutomataState {
 		
 		return result;
 	}
+=======
+>>>>>>> FETCH_HEAD
 
+	public AutomataState deepCloneImpl(Map<AutomataState, AutomataState> copies) {
+	    AutomataState copy = copies.get(this);
+	    if (copy == null) {//if this was not copied yet
+	      copy = new AutomataState(this.isFinal,this.isInitial);
+	      copy.transitions=this.transitions;
+	      // Map the new AutomataState _before_ copying children.
+	      copies.put(this, copy);
+	      for (AutomataState child : this.outs)
+	        copy.outs.add(child.deepCloneImpl(copies));//add a deep clone copy of the original graph
+	    }
+	    return copy;
+	  }
 
+	  public AutomataState deepClone() {
+	    return deepCloneImpl(new HashMap<AutomataState, AutomataState>());
+	  }
 
 }

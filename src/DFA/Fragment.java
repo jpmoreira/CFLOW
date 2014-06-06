@@ -1,5 +1,8 @@
 package DFA;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Stack;
 
 import org.hamcrest.core.IsInstanceOf;
@@ -36,6 +39,9 @@ public class Fragment{
 		else if(s instanceof ASTTerminal){
 			if(((ASTTerminal)s).isTrueTerminal){
 				return terminalFragment((ASTTerminal)s);
+			}
+			else{
+				
 			}
 		}
 		
@@ -84,13 +90,92 @@ public class Fragment{
 	
 	static Fragment terminalFragment(ASTTerminal s){
 		
-		AutomataState start=new AutomataState(false,true);
-		AutomataState end=new AutomataState(true, false);
+		AutomataState start=new AutomataState(true, false);
+		AutomataState end=new AutomataState(false, true);
 		start.addTransition(s.idString, end);
+		Fragment f=new Fragment(start, end);
+		
+		if(s.upperBound==Integer.MAX_VALUE && s.lowerBound==0)return applyKleeneStartToFragment(f);
+		else if(s.upperBound==Integer.MAX_VALUE && s.lowerBound==1)return applyPlusToFragment(f);
+		
+		return applyRepetitionTo(f, s.lowerBound, s.upperBound);
+		
+	}
+
+	static Fragment fakeTerminalFragment(ASTTerminal s,Stack<Fragment> stack){
+		
+		Fragment fragToRepeat=stack.pop();
+		
+		if(s.lowerBound==0 && s.upperBound==Integer.MAX_VALUE)return applyKleeneStartToFragment(fragToRepeat);
+		else if(s.lowerBound==1 && s.upperBound==Integer.MAX_VALUE)return applyPlusToFragment(fragToRepeat);
+		
+		return applyRepetitionTo(fragToRepeat, s.lowerBound, s.upperBound);
+		
+	}
+	
+	
+	static Fragment applyKleeneStartToFragment(Fragment f){
+		
+		Fragment newFragment= applyPlusToFragment(f);
+		
+		newFragment.start.addTransition(null, newFragment.exit);
+		return newFragment;
+		
+	}
+	static Fragment applyPlusToFragment(Fragment f){
+		
+		AutomataState start=new AutomataState(false, true);
+		AutomataState end=new AutomataState(true,false);
+	
+		Fragment frag=applyRepetitionTo(f, 1, 1);
+		
+		frag.exit.addTransition(null, frag.start);
+		start.addTransition(null, frag.start);
+		frag.exit.addTransition(null, end);
+		frag.exit.setFinal(false);
+		frag.start.setInitial(false);
+		
 		
 		return new Fragment(start, end);
 	}
+	static Fragment applyRepetitionTo(Fragment f,int min,int max){
+		
+	//create new end and start nodes	
+	AutomataState start=new AutomataState(false, true);
+	AutomataState end=new AutomataState(true,false);
+	
+	Fragment fragSequence[]=new Fragment[max];//create an array to hold all the fragments
 
+	fragSequence[0]=f.hardCopy();
+	for(int i=1;i<fragSequence.length;i++){
+		
+		//create the fragment sequence for this position
+		fragSequence[i]=f.hardCopy();
+		fragSequence[i].start.isInitial=false;
+		fragSequence[i].exit.isFinal=false;
+		
+		//connect with the previous
+		fragSequence[i-1].exit.addTransition(null, fragSequence[i].start);
+		
+		//if its beyond the minimum then should connect to the end 
+		if(i>=min ){
+			fragSequence[i].start.addTransition(null, end);
+		}
+	}
+	
+	//connect start and end to the rest of the automata
+	
+	start.addTransition(null, fragSequence[0].start);
+	fragSequence[fragSequence.length-1].exit.addTransition(null, end);
+	
+	return new Fragment(start, end);
+	
+		
+		
+		
+		
+	}
+	
 	void concatWith(Fragment next){
 		
 		exit.setFinal(false);
@@ -100,4 +185,14 @@ public class Fragment{
 		
 	}
 
+	Fragment hardCopy(){
+		
+		HashMap<AutomataState, AutomataState> cloneMap=new HashMap<AutomataState, AutomataState>();
+		AutomataState newStart=this.start.deepCloneImpl(cloneMap);
+		AutomataState newEnd=cloneMap.get(this.exit);
+		
+		return new Fragment(newStart, newEnd);
+	}
+	
+	
 }

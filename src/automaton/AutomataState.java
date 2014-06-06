@@ -29,4 +29,7 @@ public class AutomataState implements State{
 		return States.get(input);
 		
 	}
+	
+	
+	
 }
