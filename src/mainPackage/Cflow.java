@@ -73,7 +73,7 @@ public class Cflow {
 		 * */
 		
 
-		SimpleNode tree;
+		SimpleNode tree = null;
 		
 		if((args.length != 2 && args[0].equals("-restore")) ||  args.length != 7){
 			System.out.println("Invalid Usage");
@@ -151,7 +151,11 @@ public class Cflow {
 			tree = eg.Regex();
 		} catch (ParseException e) {
 			System.out.println("Invalid Regex Expression passed: "+regex);
+			return;
 		}
+		
+		NFA nfa = new NFA((SimpleNode) tree.jjtGetChild(0));
+		
 		
 		
 		
