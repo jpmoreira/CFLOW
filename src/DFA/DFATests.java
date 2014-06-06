@@ -9,6 +9,10 @@ import REGEX.ASTTerminal;
 
 public class DFATests {
 
+	
+	NFA a;
+	
+	
 	@Test
 	public void test1() {
 		ASTOR orNode=new ASTOR(27);
@@ -22,10 +26,37 @@ public class DFATests {
 		orNode.jjtAddChild(terminal1, 0);
 		orNode.jjtAddChild(terminal2, 1);
 		
-		NFA a=new NFA(orNode);
+		a=new NFA(orNode);
 		
 		a.printTable();
 		AutomataState s=a.getStart();
+		
+		AutomataState[] startClosure = s.closure();
+		
+		for (AutomataState q : startClosure){
+			System.out.println("State: " + q.id);
+		}
+		
 	}
 
+	@Test
+	public void test2(){
+		
+		AutomataState s = a.getStart();
+		
+		AutomataState[] startClosure = s.closure();
+		
+		for (AutomataState q : startClosure){
+			System.out.println("State: " + q.id);
+		}
+		
+		
+		
+		
+		
+	}
+	
+	
+	
+	
 }
