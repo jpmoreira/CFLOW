@@ -18,7 +18,6 @@ import java.util.Iterator;
 import javax.print.DocFlavor.URL;
 import javax.xml.crypto.KeySelector.Purpose;
 
-import automaton.State;
 import DFA.NFA;
 import DFA.Automaton;
 import REGEX.EG2;
@@ -39,8 +38,6 @@ public class Cflow {
 
 	
 	static private final String tempDirectoryName="_cflow_tmp";
-	static private final String executionDirectoryName="_cflow_bin";
-	static private final String[] automataClassFiles={Automaton.class.getResource("Automaton.class").getPath(),State.class.getResource("State.class").getPath()};
 	
 	static File tempDirectory=null;
 	
