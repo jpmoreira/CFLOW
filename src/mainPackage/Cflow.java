@@ -184,8 +184,6 @@ public class Cflow {
 
 		
 		executeParams = "java -cp " + sourceDir + "/automata.jar:" + sourceDir + " " + executeParams;
-		
-
 		Runtime rt = Runtime.getRuntime();
 		Process proc;
 		try {
