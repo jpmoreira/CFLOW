@@ -172,7 +172,39 @@ public class Cflow {
 		
 		System.out.println("Successfull compilation with flags " + compilerFlags);
 		
-		//removeTempDirAndContent();
+
+		Runtime rt = Runtime.getRuntime();
+		Process proc;
+		try {
+			proc = rt.exec(executeParams);
+		} catch (IOException e) {
+			System.out.println("Error running executable. Execution will be aborted.");
+			return;
+		}
+		
+		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
+		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
+		errorGobbler.start();
+		outputGobbler.start();
+		
+		try {
+			proc.waitFor();
+		} catch (InterruptedException e) {
+			System.out.println("Could not wait for execution end. Execution will be aborted.");
+			return;
+		}
+		
+		Automaton.validateResult();
+		
+		try {
+			restoreFiles(sourceDir, new File(backupDir.getAbsolutePath().concat("/"+sourceDir.getName())));
+		} catch (IOException e) {
+			System.out.println("Unable to restore files");
+		}
+		
+		
+//		removeTempDirAndContent();
+
 
 	}
 
