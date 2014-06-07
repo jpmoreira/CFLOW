@@ -20,7 +20,7 @@ public class CodeReplacer {
 	
 	private final String callStart="Automaton.consume(\"";
 	private final String callEnd="\");\n";
-	private final String importStatement="\nimport DFA.Automaton;\n";
+	private final String importStatement="\nimport automaton.Automaton;\n";
 	
 	private int lineNumber=1;
 	
@@ -57,7 +57,7 @@ public class CodeReplacer {
 			}
 			if(c=='\n')lineNumber++;
 			if(c=='@'){
-				input+=attemptReplacement(reader,outputFile);
+				input+=attemptReplacement(reader);
 			}
 			else input+=c;
 			
@@ -84,7 +84,7 @@ public class CodeReplacer {
 	}
 	
 	
-	public String attemptReplacement(BufferedReader reader,String fileName) throws IOException{
+	public String attemptReplacement(BufferedReader reader) throws IOException{
 		
 		String potentialCflowTag="@";
 		char c = 0;
@@ -102,7 +102,7 @@ public class CodeReplacer {
 			potentialCflowTag=potentialCflowTag.replace("@CFLOW","");
 			potentialCflowTag=potentialCflowTag.replaceAll("\\s+", "");
 			potentialCflowTag=potentialCflowTag.replace("\n","");
-			potentialCflowTag=callStart+potentialCflowTag+"\","+lineNumber+",\""+fileName+callEnd;
+			potentialCflowTag=callStart+potentialCflowTag+","+lineNumber+callEnd;
 		}
 		
 		if(c=='\n')lineNumber++;
