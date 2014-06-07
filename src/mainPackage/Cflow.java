@@ -209,8 +209,6 @@ public class Cflow {
 		Automaton.validateResult();
 		
 		try {
-			System.out.println(backupDir.getAbsolutePath().concat("/"+sourceDir.getName()));
-			System.out.println(sourceDir.getAbsolutePath());
 			restoreFiles(sourceDir, new File(backupDir.getAbsolutePath().concat("/"+sourceDir.getName())));
 		} catch (IOException e) {
 			System.out.println("Unable to restore files");
