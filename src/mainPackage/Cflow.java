@@ -33,7 +33,7 @@ import REGEX.SimpleNode;
  *
  *
  */
-public class CopyOfCflow {
+public class Cflow {
 
 	
 	static private final String tempDirectoryName="_cflow_tmp";
