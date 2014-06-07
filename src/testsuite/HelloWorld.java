@@ -1,4 +1,4 @@
-package Testes;
+package testsuite;
 
 public class HelloWorld {
 

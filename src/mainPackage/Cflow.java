@@ -74,7 +74,7 @@ public class Cflow {
 
 		SimpleNode tree = null;
 		
-		if((args.length == 2 && args[0].equals("-restore")) ||  args.length != 9 ){
+		if((args.length != 2 && args[0].equals("-restore")) ||  args.length != 7){
 			System.out.println("Invalid Usage");
 			printUsage();
 			return;
@@ -83,16 +83,12 @@ public class Cflow {
 		
 		String compilerFlags=getCompilerFlags(args);
 		String executeParams=getExecuteParams(args);
-		String automataPath=getAutomataJar(args);
 		
-		if (compilerFlags == null || executeParams == null || automataPath==null) {
+		if (compilerFlags == null || executeParams == null) {
 			System.out.println("Invalid Usage");
 			printUsage();
 			return;
 		}
-		
-		File automataFile=new File(automataPath);
-	
 		
 		String regex=args[0]+"\n";
 		
@@ -136,8 +132,8 @@ public class Cflow {
 		
 	
 		try {
-			if(!moveJarToSourceDir(automataFile,sourceDir)){
-				System.out.println("Original file does not exist. Execution will be aborted");
+			if(!moveJarToSourceDir(sourceDir)){
+				System.out.println("Unable to move jar file to desired place.Execution will be aborted");
 				return;
 			}
 		} catch (IOException e1) {
@@ -159,15 +155,7 @@ public class Cflow {
 		
 		NFA nfa = new NFA((SimpleNode) tree.jjtGetChild(0));
 		
-		try {
-			Automaton.getAutomaton(nfa.simplified_dfa_table());
-		} catch (IOException e1) {
-			System.out.println("Error loading states transition table. Execution will be aborted.");
-			return;
-		} catch (ClassNotFoundException e1) {
-			System.out.println("Error loading states transition table. Execution will be aborted.");
-			return;
-		}
+		
 		
 		
 		compilerFlags = "-cp " + sourceDir + "/automata.jar " + compilerFlags;
@@ -181,43 +169,10 @@ public class Cflow {
 			System.out.println("Unable to compile");
 			return;
 		}
-
 		
-		executeParams = "java -cp " + sourceDir + "/automata.jar:" + sourceDir + " " + executeParams;
+		System.out.println("Successfull compilation with flags " + compilerFlags);
 		
-		Runtime rt = Runtime.getRuntime();
-		Process proc;
-		try {
-			proc = rt.exec(executeParams);
-		} catch (IOException e) {
-			System.out.println("Error running executable. Execution will be aborted.");
-			return;
-		}
-		
-		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
-		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
-		errorGobbler.start();
-		outputGobbler.start();
-		
-		try {
-			proc.waitFor();
-		} catch (InterruptedException e) {
-			System.out.println("Could not wait for execution end. Execution will be aborted.");
-			return;
-		}
-		
-		Automaton.validateResult();
-		
-		try {
-			System.out.println(backupDir.getAbsolutePath().concat("/"+sourceDir.getName()));
-			System.out.println(sourceDir.getAbsolutePath());
-			restoreFiles(sourceDir, new File(backupDir.getAbsolutePath().concat("/"+sourceDir.getName())));
-		} catch (IOException e) {
-			System.out.println("Unable to restore files");
-		}
-		
-		
-//		removeTempDirAndContent();
+		//removeTempDirAndContent();
 
 	}
 
@@ -354,22 +309,11 @@ public class Cflow {
 	} 
 	
 	
-	private static String getAutomataJar(String[] args){
-		
-		for (int i = 0; i < args.length-1; i++) {
-			if(args[i].equals("-automata")){
-				return args[i+1];
-			}
-		}
-		
-		return null;
-	}
-	
 	private static void printUsage(){
 		
 		System.out.println("USAGE:");
 		System.out.println("	CFLOW -restore <source directory>");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" -automata <automata file path>");
+		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" ");
 	}
 	
 	private static File fileInCurrentDirectoryWithName(String name){
@@ -438,13 +382,14 @@ public class Cflow {
 		//output both stdout and stderr data from proc to stdout of this process
 		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
 		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
-		
-		System.out.println("JAVAC Output:");
 		errorGobbler.start();
 		outputGobbler.start();
 		proc.waitFor();
 		
-		System.out.println("JAVAC Output end");	
+		
+		
+		
+		
 		
 	}
 	static void copy(InputStream in, OutputStream out) throws IOException {
@@ -454,15 +399,15 @@ public class Cflow {
 	      out.write((char)c);
 	    }
 	  }
-	public static boolean moveJarToSourceDir(File originalJar,File directoryToPlaceJar) throws IOException{
+	public static boolean moveJarToSourceDir(File directoryToPlaceJar) throws IOException{
 		
-	
+		java.net.URL jarURL=Cflow.class.getResource("automata.jar");
 		
-		if(!originalJar.exists())return false;
+		File jarFile=new File(jarURL.getPath());
 		File outputFile=new File(directoryToPlaceJar.getAbsolutePath()+"/automata.jar");
 		outputFile.createNewFile();
-		if(!outputFile.exists())return false;
-		copyFile(originalJar, outputFile);
+		if(!jarFile.exists())return false;
+		copyFile(jarFile, outputFile);
 		return true;
 		
 		
