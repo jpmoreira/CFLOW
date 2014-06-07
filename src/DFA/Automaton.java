@@ -21,6 +21,10 @@ public class Automaton implements Serializable{
 	private Integer lastValidState;
 
 	private String invalidInput;
+	
+	private int firstInvalidInputLine;
+	
+	private String firstInvalidInputFileName=null;
 
 	private String lastValidInput = "";
 	
@@ -62,7 +66,7 @@ public class Automaton implements Serializable{
 	}
 
 
-	public static void consume(String input){
+	public static void consume(String input,int lineNo, String fileName){
 
 		
 		try {
@@ -83,8 +87,20 @@ public class Automaton implements Serializable{
 		automaton.lastValidState=automaton.currentState;
 		automaton.currentState=automaton.transition.get(automaton.currentState).get(input);
 		
-		if(automaton.currentState!=null)automaton.lastValidInput+=input;
-		else automaton.invalidInput+=input;
+		if(automaton.currentState!=null){
+			automaton.lastValidInput+=input;
+			
+		}
+		else{
+			
+			automaton.invalidInput+=input;
+			
+			if(automaton.firstInvalidInputFileName==null){
+				automaton.firstInvalidInputFileName=fileName;
+				automaton.firstInvalidInputLine=lineNo;
+			}
+			
+		} 
 		
 			
 
@@ -144,6 +160,7 @@ public class Automaton implements Serializable{
 			System.out.println("Accepted Substring: " + automaton.lastValidInput);
 			printExpectedInput(automaton.lastValidState);
 			System.out.println("Rejected Input: "+automaton.invalidInput);
+			System.out.println("First detected in file: "+automaton.firstInvalidInputFileName+" at line:"+automaton.firstInvalidInputLine);
 
 			return;
 
@@ -160,7 +177,7 @@ public class Automaton implements Serializable{
 
 		System.out.println("Incomplete flow.");
 		System.out.println("Program stopped working accordingly at: \"" + automaton.lastValidInput + "\"");
-		printExpectedInput(automaton.lastValidState);
+		printExpectedInput(automaton.currentState);
 
 
 

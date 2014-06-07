@@ -1,4 +1,4 @@
-package testsuite;
+package Testes;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -80,39 +80,6 @@ public class AutomatonRunTests {
 			Automaton.consume("a");
 			Automaton.consume("a");
 			//Automaton.consume("a");
-			
-			Automaton.validateResult();
-			
-		} catch (ParseException e) {
-			fail("exception thrown but shouldnt");
-		}
-		
-	}
-	@Test
-	public void test2(){
-		
-		Closure.resetClosures();
-		SimpleNode s;
-		try {
-			
-			String str = "(\"D\"){3}\n";
-			InputStream stream = new ByteArrayInputStream(str.getBytes());
-			EG2 myEG=new EG2(stream);
-			s = myEG.Regex();
-			
-			NFA a=new NFA((SimpleNode)s.jjtGetChild(0));
-			
-			try {
-				Automaton.getAutomaton(a.simplified_dfa_table());
-			} catch (IOException e) {
-				fail("Exception Thrown");
-			} catch (ClassNotFoundException e) {
-				fail("Exception Thrown");
-			}
-			
-			Automaton.consume("D");
-			Automaton.consume("D");
-			Automaton.consume("D");
 			
 			Automaton.validateResult();
 			

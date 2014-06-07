@@ -61,16 +61,16 @@ public class Fragment{
 		
 		
 		Fragment obj1=stack.pop();
-		AutomataState start=obj1.start;
-		start.setInitial(true);
+		AutomataState end=obj1.exit;//on the stack work backwards... last in concatenation pop first
+		end.setFinal(true);
 		Fragment obj2;
 		for(int i=0;i<s.jjtGetNumChildren()-1;i++){
 			obj2=stack.pop();
-			obj1.concatWith(obj2);
+			obj2.concatWith(obj1);
 			obj1=obj2;
 		}
-		AutomataState end=obj1.exit;
-		obj1.exit.setFinal(true);
+		AutomataState start=obj1.start;
+		obj1.start.setInitial(true);
 		
 		return new Fragment(start,end);
 		
