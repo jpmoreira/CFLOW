@@ -137,7 +137,7 @@ public class Cflow {
 	
 		try {
 			if(!moveJarToSourceDir(automataFile,sourceDir)){
-				System.out.println("Original file does not exist. Execution will be aborted");
+				System.out.println("Original jar does not exist at "+automataFile.getAbsolutePath()+". Execution will be aborted");
 				return;
 			}
 		} catch (IOException e1) {
@@ -184,6 +184,7 @@ public class Cflow {
 
 		
 		executeParams = "java -cp " + sourceDir + "/automata.jar:" + sourceDir + " " + executeParams;
+		System.out.println("Issuing command: "+executeParams);
 		Runtime rt = Runtime.getRuntime();
 		Process proc;
 		try {
@@ -433,6 +434,7 @@ public class Cflow {
 		
 		
 		Runtime rt = Runtime.getRuntime();
+		System.out.println("Issuing command: javac "+compilerFlags);
 		Process proc = rt.exec("javac "+compilerFlags);//TODO not passing jar file 
 		//output both stdout and stderr data from proc to stdout of this process
 		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -457,10 +459,10 @@ public class Cflow {
 		
 	
 		
-		if(!originalJar.exists())return false;
+		if(!originalJar.exists() || !originalJar.isFile())return false;
 		File outputFile=new File(directoryToPlaceJar.getAbsolutePath()+"/automata.jar");
 		outputFile.createNewFile();
-		if(!outputFile.exists())return false;
+		if(!outputFile.exists() || !outputFile.isFile())return false;
 		copyFile(originalJar, outputFile);
 		return true;
 		

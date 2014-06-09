@@ -27,7 +27,7 @@ public class CodeReplacer {
 	
 	
 	public CodeReplacer() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	
@@ -66,6 +66,11 @@ public class CodeReplacer {
 		}
 
 		reader.close();
+		
+		
+		if(!placedImport){//if no package declaration
+			input=importStatement+input;//place import at the start of the file anyway
+		}
 	
 		
 		

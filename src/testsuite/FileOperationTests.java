@@ -1,4 +1,4 @@
-package Testes;
+package testsuite;
 
 import static org.junit.Assert.*;
 
@@ -66,17 +66,6 @@ public class FileOperationTests {
 		}
 		
 		
-		
-	}
-	
-	@Test
-	public void testMoveJarFile(){
-		
-		try {
-			Cflow.moveJarToSourceDir(new File("/Users/mppl/Desktop/ola"));
-		} catch (IOException e) {
-			fail("Exception Thrown");
-		}
 		
 	}
 

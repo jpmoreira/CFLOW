@@ -1,4 +1,4 @@
-package Testes;
+package testsuite;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -42,9 +42,9 @@ public class AutomatonRunTests {
 				fail("Exception Thrown");
 			}
 			
-			Automaton.consume("a");
-			Automaton.consume("a");
-			Automaton.consume("a");
+			Automaton.consume("a",0,"");
+			Automaton.consume("a",0,"");
+			Automaton.consume("a",0,"");
 			
 			Automaton.validateResult();
 			
@@ -77,8 +77,8 @@ public class AutomatonRunTests {
 				fail("Exception Thrown");
 			}
 			
-			Automaton.consume("a");
-			Automaton.consume("a");
+			Automaton.consume("a",0,"");
+			Automaton.consume("a",0,"");
 			//Automaton.consume("a");
 			
 			Automaton.validateResult();
