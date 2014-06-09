@@ -42,14 +42,6 @@ public class FileOperationTests {
 	@Test
 	public void testRestoreFiles(){
 		
-	
-<<<<<<< HEAD:src/Testes/FileOperationTests.java
-	@Test
-	public void testRestoreFiles(){
-		
-	
-=======
->>>>>>> master:src/testsuite/FileOperationTests.java
 		File source=new File("/Users/vmineiro/Desktop/original");
 		File backUp=new File("/Users/vmineiro/Desktop/original/_cflow_tmp/");
 		File restore=new File("/Users/vmineiro/Desktop/original/_cflow_tmp/original");
@@ -75,10 +67,6 @@ public class FileOperationTests {
 		
 		
 	}
-<<<<<<< HEAD:src/Testes/FileOperationTests.java
-	
-=======
 
->>>>>>> master:src/testsuite/FileOperationTests.java
 
 }
