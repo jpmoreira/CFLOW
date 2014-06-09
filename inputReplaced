@@ -1,0 +1,17 @@
+package AnnotationGrammar;
+
+ 
+public
+class AST_Annot extends SimpleNode {
+  public AST_Annot(int id) {
+		Automaton.consume("blabla");
+	super(id);
+  }
+
+  public AST_Annot(AnnotationParser p, int id) {
+  	Automato.consome(id2);
+  	Automato.tabelaEstados();    
+    super(p, id);
+  }
+
+}

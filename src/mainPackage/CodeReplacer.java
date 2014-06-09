@@ -10,6 +10,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import AnnotationGrammar.ASTCflow;
 
@@ -18,14 +20,14 @@ public class CodeReplacer {
 	
 	private final String callStart="Automaton.consume(\"";
 	private final String callEnd="\");\n";
-	private final String importStatement="import Automaton;\n";
+	private final String importStatement="\nimport DFA.Automaton;\n";
 	
 	private int lineNumber=1;
 	
 	
 	
 	public CodeReplacer() {
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	
@@ -34,31 +36,47 @@ public class CodeReplacer {
 		lineNumber=1;
 		BufferedReader reader=new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
 		
-		String input=importStatement;
+		String input = "";
 		int readChar;
 		char c;
+		boolean placedImport=false;
 		
 
 		readChar= reader.read();
 		while(readChar!=-1){
 			
 			c=(char)readChar;
+			if (!placedImport){
+				
+				Pattern p = Pattern.compile(".*package.*;",Pattern.DOTALL);
+				Matcher m = p.matcher(input);
+				if(m.matches()){
+					input+=importStatement;
+					placedImport=true;
+				}
+			}
 			if(c=='\n')lineNumber++;
 			if(c=='@'){
-				input+=attemptReplacement(reader);
+				input+=attemptReplacement(reader,outputFile);
 			}
 			else input+=c;
 			
 			readChar=reader.read();
 			
 		}
-	
+
+		reader.close();
+		
+		
+		if(!placedImport){//if no package declaration
+			input=importStatement+input;//place import at the start of the file anyway
+		}
 	
 		
 		
 		File file = new File(outputFile);  
-		FileWriter writer = new FileWriter(file, true);  
-		writer.write(input);
+		PrintWriter writer = new PrintWriter(file);  
+		writer.print(input);
 		writer.close();
 		
 		
@@ -71,7 +89,7 @@ public class CodeReplacer {
 	}
 	
 	
-	public String attemptReplacement(BufferedReader reader) throws IOException{
+	public String attemptReplacement(BufferedReader reader,String fileName) throws IOException{
 		
 		String potentialCflowTag="@";
 		char c = 0;
@@ -89,7 +107,7 @@ public class CodeReplacer {
 			potentialCflowTag=potentialCflowTag.replace("@CFLOW","");
 			potentialCflowTag=potentialCflowTag.replaceAll("\\s+", "");
 			potentialCflowTag=potentialCflowTag.replace("\n","");
-			potentialCflowTag=callStart+potentialCflowTag+","+lineNumber+callEnd;
+			potentialCflowTag=callStart+potentialCflowTag+"\","+lineNumber+",\""+fileName+callEnd;
 		}
 		
 		if(c=='\n')lineNumber++;

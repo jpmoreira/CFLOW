@@ -18,8 +18,8 @@ import java.util.Iterator;
 import javax.print.DocFlavor.URL;
 import javax.xml.crypto.KeySelector.Purpose;
 
-import automaton.Automaton;
-import automaton.State;
+import DFA.NFA;
+import DFA.Automaton;
 import REGEX.EG2;
 import REGEX.ParseException;
 import REGEX.SimpleNode;
@@ -37,8 +37,6 @@ public class Cflow {
 
 	
 	static private final String tempDirectoryName="_cflow_tmp";
-	static private final String executionDirectoryName="_cflow_bin";
-	static private final String[] automataClassFiles={Automaton.class.getResource("Automaton.class").getPath(),State.class.getResource("State.class").getPath()};
 	
 	static File tempDirectory=null;
 	
@@ -73,19 +71,35 @@ public class Cflow {
 		 * 
 		 * */
 		
-		java.net.URL location = Cflow.class.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println(location.getFile());
-		SimpleNode tree;
+
+		SimpleNode tree = null;
 		
-		if(args.length<3){
+		if((args.length == 2 && args[0].equals("-restore")) ||  args.length != 9 ){
 			System.out.println("Invalid Usage");
 			printUsage();
 			return;
 			
 		}
+		
+		String compilerFlags=getCompilerFlags(args);
+		String executeParams=getExecuteParams(args);
+		String automataPath=getAutomataJar(args);
+		
+		if (compilerFlags == null || executeParams == null || automataPath==null) {
+			System.out.println("Invalid Usage");
+			printUsage();
+			return;
+		}
+		
+		File automataFile=new File(automataPath);
+	
+		
 		String regex=args[0]+"\n";
 		
 		File sourceDir=new File(getSourceDirName(args));
+		
+		System.out.println("Working on source directory: " + sourceDir.getAbsolutePath());
+		
 		if(!sourceDir.exists() || !sourceDir.isDirectory()){
 			System.out.println("Invalid directory choosen.");
 			printUsage();
@@ -93,6 +107,8 @@ public class Cflow {
 		}
 		
 		File backupDir=createDirectoryWithAbsolutePath(sourceDir.getAbsolutePath()+"/"+tempDirectoryName);
+		
+		
 		
 		
 		if(shouldRestore(args)){
@@ -108,35 +124,116 @@ public class Cflow {
 			return;
 		}
 		
+		System.out.println("Created backup directory: " + backupDir.getAbsolutePath());
+		
+		
+		try {
+			replaceTags(sourceDir,new CodeReplacer());
+		} catch (IOException e2) {
+			System.out.println("Unable to replace tags. Execution will be aborted");
+			return;
+		}
 		
 	
+		try {
+			if(!moveJarToSourceDir(automataFile,sourceDir)){
+				System.out.println("Original jar does not exist at "+automataFile.getAbsolutePath()+". Execution will be aborted");
+				return;
+			}
+		} catch (IOException e1) {
+			System.out.println("Unable to move jar file to desired place.Execution will be aborted");
+			return;
+		}
 		
-		String compilerFlags=getCompilerFlags(args);
-		String executeParams=getExecuteParams(args);
+		System.out.println("Moved '.jar' file to: " + sourceDir.getAbsolutePath());
 		
 		
 		InputStream regexStream = new ByteArrayInputStream(regex.getBytes());
-		new EG2(regexStream);
+		EG2 eg = new EG2(regexStream);
 		try {
-			tree = EG2.Regex();
+			tree = eg.Regex();
 		} catch (ParseException e) {
 			System.out.println("Invalid Regex Expression passed: "+regex);
+			return;
 		}
 		
-		
-		
-		if(!copyAutomataAndRelatedClassesToTempFolder())return;
+		NFA nfa = new NFA((SimpleNode) tree.jjtGetChild(0));
 		
 		try {
-			compile(sourceFiles);
-		} catch (IOException e) {
-			System.out.println("Unable To Compile");
-		} catch (InterruptedException e) {
-			System.out.println("Unable to compile");
+			Automaton.getAutomaton(nfa.simplified_dfa_table());
+		} catch (IOException e1) {
+			System.out.println("Error loading states transition table. Execution will be aborted.");
+			return;
+		} catch (ClassNotFoundException e1) {
+			System.out.println("Error loading states transition table. Execution will be aborted.");
+			return;
 		}
 		
-		//removeTempDirAndContent();
+		
+		compilerFlags = "-cp " + sourceDir + "/automata.jar " + compilerFlags;
+		
+		try {
+			compile(compilerFlags);
+		} catch (IOException e) {
+			System.out.println("Unable To Compile");
+			return;
+		} catch (InterruptedException e) {
+			System.out.println("Unable to compile");
+			return;
+		}
 
+		
+		executeParams = "java -cp " + sourceDir + "/automata.jar:" + sourceDir + " " + executeParams;
+		System.out.println("Issuing command: "+executeParams);
+		Runtime rt = Runtime.getRuntime();
+		Process proc;
+		try {
+			proc = rt.exec(executeParams);
+		} catch (IOException e) {
+			System.out.println("Error running executable. Execution will be aborted.");
+			return;
+		}
+		
+		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
+		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
+		errorGobbler.start();
+		outputGobbler.start();
+		
+		try {
+			proc.waitFor();
+		} catch (InterruptedException e) {
+			System.out.println("Could not wait for execution end. Execution will be aborted.");
+			return;
+		}
+		
+		Automaton.validateResult();
+		
+		try {
+			System.out.println(backupDir.getAbsolutePath().concat("/"+sourceDir.getName()));
+			System.out.println(sourceDir.getAbsolutePath());
+			restoreFiles(sourceDir, new File(backupDir.getAbsolutePath().concat("/"+sourceDir.getName())));
+		} catch (IOException e) {
+			System.out.println("Unable to restore files");
+		}
+		
+		
+//		removeTempDirAndContent();
+
+	}
+
+	private static void replaceTags(File sourceDir, CodeReplacer c) throws IOException {
+		
+		
+		for (File child: sourceDir.listFiles()){
+			
+			if (child.isDirectory()) 
+				replaceTags(child,c);
+			else if (child.isFile() && child.getName().matches(".*\\.java"))
+				c.replaceCflowTags(child.getAbsolutePath(), child.getAbsolutePath());
+			
+		}
+		
+		
 	}
 
 	public static void restore(File sourceDir,File backupDir){
@@ -209,7 +306,7 @@ public class Cflow {
 		
 		for(int i=0;i<args.length-1;i++){
 			
-			if(args[i]=="-dir"){
+			if(args[i].equals("-dir")){
 				return args[i+1];
 			}
 		}
@@ -257,15 +354,22 @@ public class Cflow {
 	} 
 	
 	
+	private static String getAutomataJar(String[] args){
+		
+		for (int i = 0; i < args.length-1; i++) {
+			if(args[i].equals("-automata")){
+				return args[i+1];
+			}
+		}
+		
+		return null;
+	}
+	
 	private static void printUsage(){
 		
 		System.out.println("USAGE:");
 		System.out.println("	CFLOW -restore <source directory>");
-		System.out.println("	CFLOW \"<REGEX>\"");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory>");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\"");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -execute \"<execution parameters>\" ");
-		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" ");
+		System.out.println("	CFLOW \"<REGEX>\" -dir <source directory> -compiler \"<parameters to compiler>\" -execute \"<execution parameters>\" -automata <automata file path>");
 	}
 	
 	private static File fileInCurrentDirectoryWithName(String name){
@@ -302,33 +406,7 @@ public class Cflow {
 	    }
 	}
 	
-	private static void removeTempDirAndContent(){
-		purgeDirectory(tempDirectory);
-		tempDirectory.deleteOnExit();
-		
-	}
-	
-	private static boolean copyAutomataAndRelatedClassesToTempFolder(){
-		
-		
-		for (String classFile : automataClassFiles) {
-			File inputFile=new File(classFile);
-			String[] classFileNames=classFile.split("/");
-			String classFileName=classFileNames[classFileNames.length-1];
-			
-			File output=fileInCurrentDirectoryWithName(tempDirectoryName+"/"+classFileName);
-			try {
-				copyFile(inputFile, output);
-			} catch (IOException e) {
-				System.out.println("Unable To move automata class file");
-				return false;
-			}
-			
-		
-			
-		}
-		return true;
-	}
+
 	
 	private static void copyFile(File source,File dest) throws IOException{
 		FileInputStream in=null;
@@ -350,31 +428,24 @@ public class Cflow {
 		
 	}
 		
-	private static void compile(String[] sources) throws IOException, InterruptedException{
+	private static void compile(String compilerFlags) throws IOException, InterruptedException{
 		
-		ArrayList<String> l=new ArrayList<String>();
-		l.add("javac");
-		//l.add("-classpath "+"\""+tempDirectory.getAbsolutePath()+"\"");
-		//l.add("-d "+tempDirectory.getAbsolutePath());
-		for (String sourceFile : sources) {
-			l.add(sourceFile);
-		}
 		
 		
 		
 		Runtime rt = Runtime.getRuntime();
-		Process proc = rt.exec(l.toArray(new String[l.size()]));
+		System.out.println("Issuing command: javac "+compilerFlags);
+		Process proc = rt.exec("javac "+compilerFlags);//TODO not passing jar file 
 		//output both stdout and stderr data from proc to stdout of this process
 		StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
 		StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
+		
+		System.out.println("JAVAC Output:");
 		errorGobbler.start();
 		outputGobbler.start();
 		proc.waitFor();
 		
-		
-		
-		
-		
+		System.out.println("JAVAC Output end");	
 		
 	}
 	static void copy(InputStream in, OutputStream out) throws IOException {
@@ -384,14 +455,15 @@ public class Cflow {
 	      out.write((char)c);
 	    }
 	  }
-	static boolean moveJarToSourceDir(File directoryToPlaceJar) throws IOException{
+	public static boolean moveJarToSourceDir(File originalJar,File directoryToPlaceJar) throws IOException{
 		
-		java.net.URL jarURL=Cflow.class.getResource("automata.jar");
+	
 		
-		File jarFile=new File(jarURL.getPath());
-		File outputFile=createDirectoryWithAbsolutePath(directoryToPlaceJar.getAbsolutePath()+"/automata.jar");
-		if(!jarFile.exists())return false;
-		copyFile(jarFile, outputFile);
+		if(!originalJar.exists() || !originalJar.isFile())return false;
+		File outputFile=new File(directoryToPlaceJar.getAbsolutePath()+"/automata.jar");
+		outputFile.createNewFile();
+		if(!outputFile.exists() || !outputFile.isFile())return false;
+		copyFile(originalJar, outputFile);
 		return true;
 		
 		

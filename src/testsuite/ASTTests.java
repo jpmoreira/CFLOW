@@ -1,4 +1,4 @@
-package Testes;
+package testsuite;
 
 import static org.junit.Assert.*;
 
@@ -19,10 +19,10 @@ public class ASTTests {
     	SimpleNode s;
 		try {
 			
-			String str = "\"a\"\"b\"\"c\"\n";
+			String str = "(\"a\"){3}\n";
 			InputStream stream = new ByteArrayInputStream(str.getBytes());
-			new EG2(stream);
-			s = EG2.Regex();
+			EG2 myEG=new EG2(stream);
+			s = myEG.Regex();
 			
 			assertEquals("", "");
 		} catch (ParseException e) {

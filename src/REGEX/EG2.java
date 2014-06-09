@@ -2,7 +2,7 @@
 package REGEX;
 
 public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@bgen(jjtree)*/
-  protected static JJTEG2State jjtree = new JJTEG2State();public static void main(String args [])
+  protected JJTEG2State jjtree = new JJTEG2State();public static void main(String args [])
   {
 
     try
@@ -17,7 +17,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
 
   }
 
-  static final public SimpleNode Regex() throws ParseException {
+  final public SimpleNode Regex() throws ParseException {
  /*@bgen(jjtree) Regex */
   ASTRegex jjtn000 = new ASTRegex(JJTREGEX);
   boolean jjtc000 = true;
@@ -50,7 +50,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     throw new Error("Missing return statement in function");
   }
 
-  static final public void ID_Node() throws ParseException {
+  final public void ID_Node() throws ParseException {
                 /*@bgen(jjtree) ID_Node */
                 ASTID_Node jjtn000 = new ASTID_Node(JJTID_NODE);
                 boolean jjtc000 = true;
@@ -67,7 +67,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     }
   }
 
-  static final public void Expression() throws ParseException {
+  final public void Expression() throws ParseException {
                         int nrChilds=1;
     Group();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -116,7 +116,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     }
   }
 
-  static final public void Group() throws ParseException {
+  final public void Group() throws ParseException {
                    int nrChilds=1;
     Terminal();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -176,7 +176,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     }
   }
 
-  static final public void Terminal() throws ParseException {
+  final public void Terminal() throws ParseException {
                  /*@bgen(jjtree) Terminal */
                  ASTTerminal jjtn000 = new ASTTerminal(JJTTERMINAL);
                  boolean jjtc000 = true;
@@ -273,17 +273,16 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     }
   }
 
-  static private boolean jj_initialized_once = false;
   /** Generated Token Manager. */
-  static public EG2TokenManager token_source;
-  static SimpleCharStream jj_input_stream;
+  public EG2TokenManager token_source;
+  SimpleCharStream jj_input_stream;
   /** Current token. */
-  static public Token token;
+  public Token token;
   /** Next token. */
-  static public Token jj_nt;
-  static private int jj_ntk;
-  static private int jj_gen;
-  static final private int[] jj_la1 = new int[8];
+  public Token jj_nt;
+  private int jj_ntk;
+  private int jj_gen;
+  final private int[] jj_la1 = new int[8];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
@@ -298,13 +297,6 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   }
   /** Constructor with InputStream and supplied encoding */
   public EG2(java.io.InputStream stream, String encoding) {
-    if (jj_initialized_once) {
-      System.out.println("ERROR: Second call to constructor of static parser.  ");
-      System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
-      System.out.println("       during parser generation.");
-      throw new Error();
-    }
-    jj_initialized_once = true;
     try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
     token_source = new EG2TokenManager(jj_input_stream);
     token = new Token();
@@ -314,11 +306,11 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   }
 
   /** Reinitialise. */
-  static public void ReInit(java.io.InputStream stream) {
+  public void ReInit(java.io.InputStream stream) {
      ReInit(stream, null);
   }
   /** Reinitialise. */
-  static public void ReInit(java.io.InputStream stream, String encoding) {
+  public void ReInit(java.io.InputStream stream, String encoding) {
     try { jj_input_stream.ReInit(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }
     token_source.ReInit(jj_input_stream);
     token = new Token();
@@ -330,13 +322,6 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
 
   /** Constructor. */
   public EG2(java.io.Reader stream) {
-    if (jj_initialized_once) {
-      System.out.println("ERROR: Second call to constructor of static parser. ");
-      System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
-      System.out.println("       during parser generation.");
-      throw new Error();
-    }
-    jj_initialized_once = true;
     jj_input_stream = new SimpleCharStream(stream, 1, 1);
     token_source = new EG2TokenManager(jj_input_stream);
     token = new Token();
@@ -346,7 +331,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   }
 
   /** Reinitialise. */
-  static public void ReInit(java.io.Reader stream) {
+  public void ReInit(java.io.Reader stream) {
     jj_input_stream.ReInit(stream, 1, 1);
     token_source.ReInit(jj_input_stream);
     token = new Token();
@@ -358,13 +343,6 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
 
   /** Constructor with generated Token Manager. */
   public EG2(EG2TokenManager tm) {
-    if (jj_initialized_once) {
-      System.out.println("ERROR: Second call to constructor of static parser. ");
-      System.out.println("       You must either use ReInit() or set the JavaCC option STATIC to false");
-      System.out.println("       during parser generation.");
-      throw new Error();
-    }
-    jj_initialized_once = true;
     token_source = tm;
     token = new Token();
     jj_ntk = -1;
@@ -382,7 +360,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
-  static private Token jj_consume_token(int kind) throws ParseException {
+  private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
@@ -398,7 +376,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
 
 
 /** Get the next Token. */
-  static final public Token getNextToken() {
+  final public Token getNextToken() {
     if (token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
@@ -407,7 +385,7 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   }
 
 /** Get the specific Token. */
-  static final public Token getToken(int index) {
+  final public Token getToken(int index) {
     Token t = token;
     for (int i = 0; i < index; i++) {
       if (t.next != null) t = t.next;
@@ -416,19 +394,19 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
     return t;
   }
 
-  static private int jj_ntk() {
+  private int jj_ntk() {
     if ((jj_nt=token.next) == null)
       return (jj_ntk = (token.next=token_source.getNextToken()).kind);
     else
       return (jj_ntk = jj_nt.kind);
   }
 
-  static private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
-  static private int[] jj_expentry;
-  static private int jj_kind = -1;
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private int[] jj_expentry;
+  private int jj_kind = -1;
 
   /** Generate ParseException. */
-  static public ParseException generateParseException() {
+  public ParseException generateParseException() {
     jj_expentries.clear();
     boolean[] la1tokens = new boolean[17];
     if (jj_kind >= 0) {
@@ -459,11 +437,11 @@ public class EG2/*@bgen(jjtree)*/implements EG2TreeConstants, EG2Constants {/*@b
   }
 
   /** Enable tracing. */
-  static final public void enable_tracing() {
+  final public void enable_tracing() {
   }
 
   /** Disable tracing. */
-  static final public void disable_tracing() {
+  final public void disable_tracing() {
   }
 
 }
