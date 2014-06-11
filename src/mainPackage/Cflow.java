@@ -112,7 +112,7 @@ public class Cflow {
 		
 		
 		if(shouldRestore(args)){
-			restore(sourceDir, backupDir);
+			//restore(sourceDir, backupDir);
 			System.out.println("Restore Sucessfull.");
 			return;
 		}
@@ -209,9 +209,8 @@ public class Cflow {
 		Automaton.validateResult();
 		
 		try {
-			System.out.println(backupDir.getAbsolutePath().concat("/"+sourceDir.getName()));
-			System.out.println(sourceDir.getAbsolutePath());
-			restoreFiles(sourceDir, new File(backupDir.getAbsolutePath().concat("/"+sourceDir.getName())));
+			restore(sourceDir, backupDir);
+			//restoreFiles(sourceDir, new File(backupDir.getAbsolutePath().concat("/"+sourceDir.getName())));
 		} catch (IOException e) {
 			System.out.println("Unable to restore files");
 		}
@@ -236,7 +235,19 @@ public class Cflow {
 		
 	}
 
-	public static void restore(File sourceDir,File backupDir){
+
+	private static void restore(File source,File backup) throws IOException{
+		
+		File jarFile=new File(source.getAbsolutePath()+"/automata.jar");
+		if(jarFile.exists())jarFile.delete();
+		
+		File rootBackup=new File(backup.getAbsolutePath().concat("/"+source.getName()));
+		
+		restoreFiles(source, rootBackup);
+		
+		deleteDir(backup);
+		
+		
 		
 		
 	}
@@ -276,10 +287,6 @@ public class Cflow {
 	
 	public static void restoreFiles(File operationItem,File backupItem) throws IOException{
 		
-		if(operationItem.isFile() && backupItem.isFile() && operationItem.getName().equals(backupItem.getName())){
-			
-			copyFile(backupItem, operationItem);
-		}
 		if(operationItem.isDirectory() && backupItem.isDirectory() && operationItem.getName().equals(backupItem.getName())){
 			
 			for (File backup : backupItem.listFiles()) {
@@ -288,10 +295,15 @@ public class Cflow {
 					
 					if(backup.getName().equals(originalFile.getName())){
 						
-						if((backup.isFile() && originalFile.isFile()) || backup.isDirectory() && originalFile.isDirectory()){
+						if(backup.isFile() && originalFile.isFile()){
 							
-							restoreFiles(originalFile,backup);
+							copyFile(backup, originalFile);
+							
 						}
+						else if(backup.isDirectory() && originalFile.isDirectory()){
+							restoreFiles(originalFile, backupItem);
+						}
+						
 						
 					}
 				}
@@ -469,4 +481,39 @@ public class Cflow {
 		
 	}
 
+	
+	public static void deleteDir(File file)
+	    	throws IOException{
+	 
+	    	if(file.isDirectory()){
+	 
+	    		//directory is empty, then delete it
+	    		if(file.list().length==0){
+	 
+	    		   file.delete();
+	 
+	    		}else{
+	 
+	    		   //list all the directory contents
+	        	   String files[] = file.list();
+	 
+	        	   for (String temp : files) {
+	        	      //construct the file structure
+	        	      File fileDelete = new File(file, temp);
+	 
+	        	      //recursive delete
+	        	     deleteDir(fileDelete);
+	        	   }
+	 
+	        	   //check the directory again, if empty then delete it
+	        	   if(file.list().length==0){
+	           	     file.delete();
+	        	   }
+	    		}
+	 
+	    	}else{
+	    		//if file, then delete it
+	    		file.delete();
+	    	}
+	    }
 }
